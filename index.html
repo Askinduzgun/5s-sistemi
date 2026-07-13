@@ -6,6 +6,9 @@
     <title>5S Akıllı Mobil Denetim & Aksiyon Takip Sistemi</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- CANLI VERİTABANI İÇİN FIREBASE KÜTÜPHANELERİ -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 </head>
 <body class="bg-slate-50 font-sans antialiased text-slate-800 pb-12">
 
@@ -13,7 +16,7 @@
     <div class="bg-slate-900 text-white px-4 py-2 flex justify-between items-center shadow-md sticky top-0 z-50">
         <div class="flex items-center gap-2">
             <span class="text-xl">📊</span>
-            <span class="font-bold text-sm tracking-wide">5S SMART SYSTEM</span>
+            <span class="font-bold text-sm tracking-wide">5S SMART SYSTEM (LIVE)</span>
         </div>
         <div>
             <button id="btn-login-toggle" onclick="authModaliAc()" class="bg-blue-600 hover:bg-blue-700 text-xs font-semibold px-3 py-1.5 rounded-lg transition-all shadow">
@@ -30,9 +33,8 @@
         <!-- HEADER -->
         <header class="mb-4 bg-white p-4 rounded-xl shadow-sm border border-slate-100">
             <h1 class="text-xl font-black text-slate-800 tracking-tight">5S Saha Bildirim & Raporlama</h1>
-            <p class="text-xs text-slate-500 mt-0.5">QR Kod ile uyumlu, akıllı metin analizli ve mobil öncelikli uygunsuzluk yönetim sistemi.</p>
+            <p class="text-xs text-slate-500 mt-0.5">Bulut veritabanı entegrasyonlu ortak saha yönetim paneli.</p>
             
-            <!-- YÖNETİCİ TABLARI -->
             <div id="yonetici-tablari" class="hidden flex bg-slate-100 p-1 rounded-lg border border-slate-200 mt-3 gap-1">
                 <button id="tab-qr" onclick="sekmeDegistir('qr')" class="flex-1 text-center py-2 rounded-md font-bold text-xs transition-all bg-white text-blue-600 shadow-sm">
                     📱 Hızlı QR Bildirim
@@ -46,8 +48,6 @@
             </div>
         </header>
 
-        <!-- SEKMELER -->
-        
         <!-- 1. QR HIZLI UYGUNSUZLUK BİLDİRİM (HERKESE AÇIK) -->
         <div id="sayfa-qr" class="block space-y-4">
             <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-100">
@@ -64,7 +64,7 @@
 
                     <div>
                         <label class="block text-slate-700 font-bold mb-1 text-xs uppercase tracking-wider">Gördüğünüz Uygunsuzluğu Yazın</label>
-                        <textarea id="qr-metin" rows="4" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500" placeholder="Örn: Yerler çok pis, çapak ve yağ dökülmüş / Raf etiketleri yırtılmış okunmuyor / İş güvenliği gözlüğü takılmamış..." required></textarea>
+                        <textarea id="qr-metin" rows="4" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500" placeholder="Örn: Yerler kirli, yağ dökülmüş..." required></textarea>
                     </div>
 
                     <div>
@@ -78,7 +78,6 @@
                 </form>
             </div>
             
-            <!-- MOBİL İÇİN ANLIK SKOR ÖZETİ -->
             <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100">
                 <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Hat Güncel 5S Skorları</h3>
                 <div id="mobil-hat-skorlari" class="grid grid-cols-2 gap-2 text-xs"></div>
@@ -97,7 +96,6 @@
 
         <!-- 3. YÖNETİCİ RAPORLAMA PANELSİ (SADECE YÖNETİCİYE ÖZEL) -->
         <div id="sayfa-rapor" class="hidden space-y-4">
-            <!-- ÖZET KARTLAR -->
             <div class="grid grid-cols-2 gap-3">
                 <div class="bg-gradient-to-br from-indigo-600 to-indigo-700 text-white p-4 rounded-xl shadow-sm">
                     <p class="text-indigo-100 text-[10px] font-bold uppercase tracking-wider">FABRİKA GENEL ORT.</p>
@@ -109,7 +107,6 @@
                 </div>
             </div>
 
-            <!-- HİYERARŞİ TABLOSU -->
             <div class="bg-white p-4 rounded-xl border border-slate-100 shadow-sm overflow-x-auto">
                 <h3 class="text-sm font-bold text-slate-800 mb-3">Birim Liderleri Yönetim Matrisi</h3>
                 <table class="w-full text-left text-[11px] border-collapse">
@@ -124,7 +121,6 @@
                 </table>
             </div>
 
-            <!-- GRAFİK -->
             <div class="bg-white p-4 rounded-xl border border-slate-100 shadow-sm">
                 <h3 class="text-sm font-bold text-slate-800 mb-2">Birim Lideri Başarı Dağılımı</h3>
                 <div style="height: 220px; position: relative;">
@@ -148,11 +144,19 @@
     </div>
 
     <script>
-        // Tanımlı Şifre
+        // SİZİN ÖZEL VERİTABANI BAĞLANTINIZ
+        const firebaseConfig = {
+            databaseURL: "https://fir-sistemi-b2813-default-rtdb.europe-west1.firebasedatabase.app/" 
+        };
+        
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
         const ADMIN_PASSWORD = "5S_Admin_2026";
         let isAdmin = false;
+        let kayitlar = [];
+        let trendChartInstance = null;
 
-        // Kurumsal Hiyerarşi Listesi
         const hatlar = {
             "MACRO LABORATUVAR": { ekipLideri: "MEHMET KÖMÜRCÜ", birimLideri: "ERHAN ERBUCAN", mudur: "TUNCAY ASLAN" },
             "ŞÜPHELİ ALANLAR / PROSES KALİTE / FORD FIREWALL ALANI": { ekipLideri: "MEHMET KÖMÜRCÜ", birimLideri: "ERHAN ERBUCAN", mudur: "TUNCAY ASLAN" },
@@ -171,8 +175,7 @@
             "İNSAN KAYNAKLARI": { ekipLideri: "MUHAMMET HANBABA", birimLideri: "MUHAMMET HANBABA", mudur: "BAHADDİN ERSOY" }
         };
 
-        // 5S Adımları Yapısı
-        const 	kategoriler5S = {
+        const kategoriler5S = {
             S1: "1.ADIM: GEREKSİZLERİ KALDIR (Seiri)",
             S2: "2.ADIM: DÜZENLE (Seiton)",
             S3: "3.ADIM: TEMİZLE (Seiso)",
@@ -180,117 +183,86 @@
             S5: "5.ADIM: DİSİPLİN (Shitsuke)"
         };
 
-        // LocalStorage Veritabanı Altyapısı
-        let kayitlar = JSON.parse(localStorage.getItem('5s_v3_kayitlar')) || [];
-        let trendChartInstance = null;
+        // Bulut Veritabanını Canlı İzleme Fonksiyonu
+        db.ref("denetimler").on("value", (snapshot) => {
+            const data = snapshot.val();
+            kayitlar = [];
+            if (data) {
+                Object.keys(data).forEach(key => {
+                    kayitlar.push({ firebaseKey: key, ...data[key] });
+                });
+            }
+            arayuzuGuncelle();
+        });
 
-        // Akıllı Metin Analizi Motoru (Kelime Dağarcığı Eşleştirme)
         function akilliMetinAnalizi(metin) {
             let m = metin.toLowerCase('tr-TR');
-            
-            // İş Güvenliği & Disiplin tetikleyicileri
-            if(m.includes('is güvenligi') || m.includes('kkd') || m.includes('gözlük') || m.includes('ayakkabi') || m.includes('kıyafet') || m.includes('maske') || m.includes('bariyer') || m.includes('yangın') || m.includes('keskin')) {
-                if(m.includes('yangın') || m.includes('bariyer') || m.includes('kablo')) {
-                    return { kat: "S4", kuralNo: 1, kuralAd: "İş Güvenliği & Yangın Söndürücü Kontrolü" };
-                }
-                return { kat: "S5", kuralNo: 1, kuralAd: "İş Güvenliği Kurallarına Uyum" };
+            if(m.includes('is güvenligi') || m.includes('kkd') || m.includes('gözlük') || m.includes('ayakkabi') || m.includes('maske') || m.includes('yangın')) {
+                return { kat: "S5", kuralAd: "İş Güvenliği Kurallarına Uyum" };
             }
-            
-            // Temizlik tetikleyicileri
-            if(m.includes('kir') || m.includes('pis') || m.includes('yağ') || m.includes('su') || m.includes('çapak') || m.includes('talaş') || m.includes('toz') || m.includes('yolluk') || m.includes('temiz değil') || m.includes('leke')) {
-                if(m.includes('yerler') || m.includes('duvar') || m.includes('cam') || m.includes('zemin')) {
-                    return { kat: "S3", kuralNo: 1, kuralAd: "Zemin, Duvar, Cam Temizliği" };
-                }
-                return { kat: "S3", kuralNo: 2, kuralAd: "Kirlilik Kaynakları Kontrolü" };
+            if(m.includes('kir') || m.includes('pis') || m.includes('yağ') || m.includes('çapak') || m.includes('toz') || m.includes('temiz')) {
+                return { kat: "S3", kuralAd: "Zemin ve Ekipman Temizliği" };
             }
-
-            // Hata Kartı & SAP / QDMS tetikleyicileri
-            if(m.includes('hata kart') || m.includes('sap') || m.includes('qdms') || m.includes('ewo') || m.includes('smp')) {
-                return { kat: "S3", kuralNo: 3, kuralAd: "Otonom Bakım & Sistem Girişleri" };
+            if(m.includes('etiket') || m.includes('tanım') || m.includes('çizgi') || m.includes('yerleş') || m.includes('raf')) {
+                return { kat: "S2", kuralAd: "Etiketleme & Yer Tanımlamaları" };
             }
-
-            // Düzen & Etiket tetikleyicileri
-            if(m.includes('etiket') || m.includes('tanım') || m.includes('çizgi') || m.includes('yürüme yolu') || m.includes('yerleş') || m.includes('masa') || m.includes('raf') || m.includes('çekmece') || m.includes('max-min') || m.includes('bulunmuyor')) {
-                if(m.includes('etiket') || m.includes('raf') || m.includes('çekmece') || m.includes('30 sn')) {
-                    return { kat: "S2", kuralNo: 2, kuralAd: "Etiketleme & 30 Saniye Standardı" };
-                }
-                return { kat: "S2", kuralNo: 1, kuralAd: "Yer Tanımlamaları & Çizgiler" };
+            if(m.includes('fazla') || m.includes('atıl') || m.includes('gereksiz') || m.includes('hurda')) {
+                return { kat: "S1", kuralAd: "Gereksiz Ekipman Ayıklama" };
             }
-
-            // Fazlalık / Atıl Ekipman tetikleyicileri
-            if(m.includes('fazla') || m.includes('atıl') || m.includes('gereksiz') || m.includes('eski') || m.includes('kullanılmayan') || m.includes('hurda') || m.includes('dolap') || m.includes('kasa')) {
-                return { kat: "S1", kuralNo: 1, kuralAd: "Gereksiz/Atıl Ekipman Ayıklama" };
-            }
-
-            // Varsayılan olarak Genel Temizlik / Düzen ihlali
-            return { kat: "S1", kuralNo: 1, kuralAd: "Genel 5S İhlali" };
+            return { kat: "S4", kuralAd: "Genel 5S İhlali" };
         }
 
-        // Form Elemanlarını Doldur
         function bileşenleriDoldur() {
-            const selectQr = document.getElementById('qr-hat');
-            selectQr.innerHTML = Object.keys(hatlar).map(h => `<option value="${h}">${h}</option>`).join('');
+            document.getElementById('qr-hat').innerHTML = Object.keys(hatlar).map(h => `<option value="${h}">${h}</option>`).join('');
         }
 
-        // QR Uygunsuzluk Kaydı (Mavi Yaka / Sahadan Giriş)
         function qrBildirimKaydet(e) {
             e.preventDefault();
             const hat = document.getElementById('qr-hat').value;
             const metin = document.getElementById('qr-metin').value;
             const fotoInput = document.getElementById('qr-foto');
-
-            // Akıllı eşleştirme motoru çalışıyor
             const analiz = akilliMetinAnalizi(metin);
 
             let yeniBildirim = {
                 id: Date.now(),
                 hat: hat,
                 metin: metin,
-                katKod: analiz.cat || analiz.kat,
+                katKod: analiz.kat,
                 kategoriAd: kategoriler5S[analiz.kat],
                 kuralAd: analiz.kuralAd,
-                durum: "AÇIK", // Onay/Kapatma bekliyor
+                durum: "AÇIK",
                 sorumlu: hatlar[hat].birimLideri,
                 hedefTarih: "--",
                 tarih: new Date().toLocaleDateString('tr-TR'),
                 foto: ""
             };
 
+            const bulutaGonder = (veri) => {
+                db.ref("denetimler").push(veri);
+                document.getElementById('qr-formu').reset();
+                alert("Uygunsuzluk bulut veritabanına başarıyla gönderildi!");
+            };
+
             if (fotoInput.files && fotoInput.files[0]) {
                 const reader = new FileReader();
                 reader.onload = function(event) {
                     yeniBildirim.foto = event.target.result;
-                    kayitlar.push(yeniBildirim);
-                    kaydetVeYenile();
+                    bulutaGonder(yeniBildirim);
                 };
                 reader.readAsDataURL(fotoInput.files[0]);
             } else {
-                kayitlar.push(yeniBildirim);
-                kaydetVeYenile();
+                bulutaGonder(yeniBildirim);
             }
-
-            document.getElementById('qr-formu').reset();
-            alert("Uygunsuzluk başarıyla sisteme aktarıldı. Analiz Edilen Sınıf: " + yeniBildirim.kategoriAd);
         }
 
-        function kaydetVeYenile() {
-            localStorage.setItem('5s_v3_kayitlar', JSON.stringify(kayitlar));
-            arayuzuGuncelle();
-        }
-
-        // Hat Skorunu Hesaplama (Açık ceza maddesi varsa 100 üzerinden düşer)
         function hatSkorHesapla(hatAdi) {
             let acikCezalar = kayitlar.filter(k => k.hat === hatAdi && k.durum === "AÇIK");
-            // Her açık ceza maddesi hattın 100 tam puanından 25 puan kırar (Minimum 0)
-            let puan = 100 - (acikCezalar.length * 25);
-            return Math.max(0, puan);
+            return Math.max(0, 100 - (acikCezalar.length * 25));
         }
 
         function arayuzuGuncelle() {
-            // Mobil Skor Kartları Listesi
             const mKonteyner = document.getElementById('mobil-hat-skorlari');
             mKonteyner.innerHTML = '';
-            
             for(let h in hatlar) {
                 let skor = hatSkorHesapla(h);
                 let renk = skor >= 85 ? 'text-emerald-600 bg-emerald-50' : (skor >= 60 ? 'text-amber-600 bg-amber-50' : 'text-rose-600 bg-rose-50');
@@ -301,7 +273,6 @@
                     </div>`;
             }
 
-            // Aksiyon Listesi Güncelleme (Sadece Admin Görür)
             const aKonteyner = document.getElementById('aksiyon-listesi-konteyner');
             let acikKayitlar = kayitlar.filter(k => k.durum === "AÇIK");
             document.getElementById('badge-aksiyon-sayi').innerText = acikKayitlar.length;
@@ -314,21 +285,21 @@
                         <div class="flex justify-between items-start">
                             <div>
                                 <h4 class="font-bold text-slate-800 text-sm">${k.hat}</h4>
-                                <p class="text-[10px] text-slate-400">Bildirim Tarihi: ${k.tarih} | Sorumlu Lider: ${k.sorumlu}</p>
+                                <p class="text-[10px] text-slate-400">Tarih: ${k.tarih} | Lider: ${k.sorumlu}</p>
                             </div>
                             <span class="bg-rose-100 text-rose-800 px-2 py-0.5 rounded font-bold text-[10px] uppercase">${k.katKod || '5S'}</span>
                         </div>
-                        <p class="text-slate-600 bg-slate-50 p-2 rounded border border-dashed"><b class="text-slate-800">Bulgu:</b> ${k.metin}</p>
-                        <div class="text-[10px] text-indigo-700 font-semibold">📍 Otomatik Algılanan Kriter: ${k.kuralAd}</div>
+                        <p class="text-slate-600 bg-slate-50 p-2 rounded border border-dashed"><b>Bulgu:</b> ${k.metin}</p>
+                        <div class="text-[10px] text-indigo-700 font-semibold">📍 Kriter: ${k.kuralAd}</div>
                         ${k.foto ? `<img src="${k.foto}" class="w-20 h-20 object-cover rounded border">` : ''}
                         
                         <div class="flex gap-2 pt-1 border-t items-center justify-end">
                             <div class="flex items-center gap-1 mr-auto">
                                 <span class="text-[10px] text-slate-400">Termin:</span>
-                                <input type="date" id="t-date-${k.id}" value="${k.hedefTarih !== '--' ? k.hedefTarih : ''}" onchange="terminGuncelle(${k.id}, this.value)" class="p-1 border rounded text-[11px]">
+                                <input type="date" value="${k.hedefTarih !== '--' ? k.hedefTarih : ''}" onchange="terminGuncelle('${k.firebaseKey}', this.value)" class="p-1 border rounded text-[11px]">
                             </div>
-                            <button onclick="aksiyonKapat(${k.id})" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-3 py-1 rounded text-[11px] shadow">
-                                ✓ Kapat (Onayla)
+                            <button onclick="aksiyonKapat('${k.firebaseKey}')" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-3 py-1 rounded text-[11px] shadow">
+                                ✓ Kapat
                             </button>
                         </div>
                     </div>`;
@@ -337,23 +308,14 @@
             if(isAdmin) yoneticiPaneliniHesapla();
         }
 
-        function terminGuncelle(id, val) {
-            let idx = kayitlar.findIndex(k => k.id === id);
-            if(idx !== -1) {
-                kayitlar[idx].hedefTarih = val;
-                localStorage.setItem('5s_v3_kayitlar', JSON.stringify(kayitlar));
-            }
+        function terminGuncelle(firebaseKey, val) {
+            db.ref("denetimler/" + firebaseKey).update({ hedefTarih: val });
         }
 
-        function aksiyonKapat(id) {
-            let idx = kayitlar.findIndex(k => k.id === id);
-            if(idx !== -1) {
-                kayitlar[idx].durum = "KAPALI";
-                kaydetVeYenile();
-            }
+        function aksiyonKapat(firebaseKey) {
+            db.ref("denetimler/" + firebaseKey).update({ durum: "KAPALI" });
         }
 
-        // Yönetici Ekran Veri Hesaplamaları
         function yoneticiPaneliniHesapla() {
             let tPuan = 0, hSayisi = 0, birimGruplari = {};
             let acikAksiyonlar = kayitlar.filter(k => k.durum === "AÇIK").length;
@@ -362,7 +324,7 @@
                 let p = hatSkorHesapla(h);
                 tPuan += p; hSayisi++;
                 let bl = hatlar[h].birimLideri;
-                if(!birimGruplari[bl]) birimGruplari[bl] = { name: bl, mudur: hatlar[h].mudur, hatlar: [], score: 0 };
+                if(!birimGruplari[bl]) birimGruplari[bl] = { name: bl, hatlar: [], score: 0 };
                 birimGruplari[bl].hatlar.push(h); birimGruplari[bl].score += p;
             }
 
@@ -395,18 +357,16 @@
 
             trendChartInstance = new Chart(canvas.getContext('2d'), {
                 type: 'bar',
-                data: { labels: labels, datasets: [{ label: 'Birim Ortalama 5S Skoru', data: values, backgroundColor: '#4f46e5', borderRadius: 4 }] },
+                data: { labels: labels, datasets: [{ label: 'Birim Ortalama Skoru', data: values, backgroundColor: '#4f46e5', borderRadius: 4 }] },
                 options: { responsive: true, maintainAspectRatio: false, scales: { y: { min: 0, max: 100 } } }
             });
         }
 
-        // Yetkilendirme & Şifre Yönetimi
         function authModaliAc() { document.getElementById('auth-modal').classList.remove('hidden'); }
         function authModaliKapat() { document.getElementById('auth-modal').classList.add('hidden'); document.getElementById('auth-sifre').value = ''; }
         
         function sifreKontrol() {
-            const girilen = document.getElementById('auth-sifre').value;
-            if(girilen === ADMIN_PASSWORD) {
+            if(document.getElementById('auth-sifre').value === ADMIN_PASSWORD) {
                 isAdmin = true;
                 document.getElementById('yonetici-tablari').classList.remove('hidden');
                 document.getElementById('btn-login-toggle').classList.add('hidden');
@@ -414,7 +374,7 @@
                 authModaliKapat();
                 sekmeDegistir('aksiyon');
             } else {
-                alert("Hatalı yönetim şifresi girdiniz!");
+                alert("Hatalı şifre!");
             }
         }
 
@@ -431,7 +391,6 @@
             document.getElementById('sayfa-aksiyon').classList.toggle('hidden', hedef !== 'aksiyon');
             document.getElementById('sayfa-rapor').classList.toggle('hidden', hedef !== 'rapor');
             
-            // Tab Buton Renk Yönetimi
             document.getElementById('tab-qr').className = hedef === 'qr' ? 'flex-1 text-center py-2 rounded-md font-bold text-xs bg-white text-blue-600 shadow-sm' : 'flex-1 text-center py-2 text-slate-600 font-bold text-xs';
             document.getElementById('tab-aksiyon').className = hedef === 'aksiyon' ? 'flex-1 text-center py-2 rounded-md font-bold text-xs bg-white text-blue-600 shadow-sm' : 'flex-1 text-center py-2 text-slate-600 font-bold text-xs';
             document.getElementById('tab-rapor').className = hedef === 'rapor' ? 'flex-1 text-center py-2 rounded-md font-bold text-xs bg-white text-blue-600 shadow-sm' : 'flex-1 text-center py-2 text-slate-600 font-bold text-xs';
@@ -439,7 +398,7 @@
             arayuzuGuncelle();
         }
 
-        window.onload = () => { bileşenleriDoldur(); arayuzuGuncelle(); };
+        window.onload = () => { bileşenleriDoldur(); };
     </script>
 </body>
 </html>

@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>5S Akıllı Mobil Denetim & Aksiyon Takip Sistemi</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-slate-50 font-sans antialiased text-slate-800 pb-12">
+
+    <!-- TOP BAR / LOGIN -->
+    <div class="bg-slate-900 text-white px-4 py-2 flex justify-between items-center shadow-md sticky top-0 z-50">
+        <div class="flex items-center gap-2">
+            <span class="text-xl">📊</span>
+            <span class="font-bold text-sm tracking-wide">5S SMART SYSTEM</span>
+        </div>
+        <div>
+            <button id="btn-login-toggle" onclick="authModaliAc()" class="bg-blue-600 hover:bg-blue-700 text-xs font-semibold px-3 py-1.5 rounded-lg transition-all shadow">
+                🔑 Yönetici Girişi
+            </button>
+            <button id="btn-logout" onclick="cikisYap()" class="hidden bg-rose-600 hover:bg-rose-700 text-xs font-semibold px-3 py-1.5 rounded-lg transition-all shadow">
+                🔒 Çıkış Yap
+            </button>
+        </div>
+    </div>
+
+    <div class="max-w-4xl mx-auto px-3 mt-4">
+        
+        <!-- HEADER -->
+        <header class="mb-4 bg-white p-4 rounded-xl shadow-sm border border-slate-100">
+            <h1 class="text-xl font-black text-slate-800 tracking-tight">5S Saha Bildirim & Raporlama</h1>
+            <p class="text-xs text-slate-500 mt-0.5">QR Kod ile uyumlu, akıllı metin analizli ve mobil öncelikli uygunsuzluk yönetim sistemi.</p>
+            
+            <!-- YÖNETİCİ TABLARI -->
+            <div id="yonetici-tablari" class="hidden flex bg-slate-100 p-1 rounded-lg border border-slate-200 mt-3 gap-1">
+                <button id="tab-qr" onclick="sekmeDegistir('qr')" class="flex-1 text-center py-2 rounded-md font-bold text-xs transition-all bg-white text-blue-600 shadow-sm">
+                    📱 Hızlı QR Bildirim
+                </button>
+                <button id="tab-aksiyon" onclick="sekmeDegistir('aksiyon')" class="flex-1 text-center py-2 rounded-md font-bold text-xs transition-all text-slate-600">
+                    ⚠️ Aksiyon Takip (<span id="badge-aksiyon-sayi">0</span>)
+                </button>
+                <button id="tab-rapor" onclick="sekmeDegistir('rapor')" class="flex-1 text-center py-2 rounded-md font-bold text-xs transition-all text-slate-600">
+                    📊 Yönetim Paneli
+                </button>
+            </div>
+        </header>
+
+        <!-- SEKMELER -->
+        
+        <!-- 1. QR HIZLI UYGUNSUZLUK BİLDİRİM (HERKESE AÇIK) -->
+        <div id="sayfa-qr" class="block space-y-4">
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-100">
+                <div class="flex items-center gap-2 border-b pb-2 mb-4">
+                    <span class="text-lg">🚨</span>
+                    <h2 class="text-base font-bold text-slate-800">Hızlı Uygunsuzluk Bildir</h2>
+                </div>
+                
+                <form id="qr-formu" onsubmit="qrBildirimKaydet(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-slate-700 font-bold mb-1 text-xs uppercase tracking-wider">Hangi Hat / Alan?</label>
+                        <select id="qr-hat" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none" required></select>
+                    </div>
+
+                    <div>
+                        <label class="block text-slate-700 font-bold mb-1 text-xs uppercase tracking-wider">Gördüğünüz Uygunsuzluğu Yazın</label>
+                        <textarea id="qr-metin" rows="4" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500" placeholder="Örn: Yerler çok pis, çapak ve yağ dökülmüş / Raf etiketleri yırtılmış okunmuyor / İş güvenliği gözlüğü takılmamış..." required></textarea>
+                    </div>
+
+                    <div>
+                        <label class="block text-slate-700 font-bold mb-1 text-xs uppercase tracking-wider">Fotoğraf Ekle (Opsiyonel)</label>
+                        <input type="file" id="qr-foto" accept="image/*" class="w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:rounded-md file:border-0 file:bg-blue-50 file:text-blue-700 file:font-bold">
+                    </div>
+
+                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg text-sm shadow transition-all flex justify-center items-center gap-2">
+                        <span>📤 Uygunsuzluğu Gönder</span>
+                    </button>
+                </form>
+            </div>
+            
+            <!-- MOBİL İÇİN ANLIK SKOR ÖZETİ -->
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100">
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Hat Güncel 5S Skorları</h3>
+                <div id="mobil-hat-skorlari" class="grid grid-cols-2 gap-2 text-xs"></div>
+            </div>
+        </div>
+
+        <!-- 2. AKSİYON TAKİP SİSTEMİ (SADECE YÖNETİCİYE ÖZEL) -->
+        <div id="sayfa-aksiyon" class="hidden space-y-4">
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100">
+                <h2 class="text-base font-bold text-slate-800 border-b pb-2 mb-3 flex items-center gap-2">
+                    <span class="w-2 h-4 bg-amber-500 rounded-full"></span> Açık Uygunsuzluk & Aksiyon Listesi
+                </h2>
+                <div id="aksiyon-listesi-konteyner" class="space-y-3"></div>
+            </div>
+        </div>
+
+        <!-- 3. YÖNETİCİ RAPORLAMA PANELSİ (SADECE YÖNETİCİYE ÖZEL) -->
+        <div id="sayfa-rapor" class="hidden space-y-4">
+            <!-- ÖZET KARTLAR -->
+            <div class="grid grid-cols-2 gap-3">
+                <div class="bg-gradient-to-br from-indigo-600 to-indigo-700 text-white p-4 rounded-xl shadow-sm">
+                    <p class="text-indigo-100 text-[10px] font-bold uppercase tracking-wider">FABRİKA GENEL ORT.</p>
+                    <h3 id="genel-ortalama-puan" class="text-2xl font-black mt-1">--</h3>
+                </div>
+                <div class="bg-white p-4 rounded-xl border border-slate-100 shadow-sm">
+                    <p class="text-slate-400 text-[10px] font-bold uppercase tracking-wider">Açık Aksiyon Sayısı</p>
+                    <h3 id="yonetim-toplam-acik" class="text-2xl font-bold text-amber-500 mt-1">0</h3>
+                </div>
+            </div>
+
+            <!-- HİYERARŞİ TABLOSU -->
+            <div class="bg-white p-4 rounded-xl border border-slate-100 shadow-sm overflow-x-auto">
+                <h3 class="text-sm font-bold text-slate-800 mb-3">Birim Liderleri Yönetim Matrisi</h3>
+                <table class="w-full text-left text-[11px] border-collapse">
+                    <thead>
+                        <tr class="bg-slate-50 text-slate-600 uppercase font-semibold border-b">
+                            <th class="p-2">Birim Lideri</th>
+                            <th class="p-2 text-center">Ort. Skor</th>
+                            <th class="p-2 text-center">Durum</th>
+                        </tr>
+                    </thead>
+                    <tbody id="yonetici-hiyerarsi-tablo" class="text-slate-600"></tbody>
+                </table>
+            </div>
+
+            <!-- GRAFİK -->
+            <div class="bg-white p-4 rounded-xl border border-slate-100 shadow-sm">
+                <h3 class="text-sm font-bold text-slate-800 mb-2">Birim Lideri Başarı Dağılımı</h3>
+                <div style="height: 220px; position: relative;">
+                    <canvas id="trendChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- AUTH MODAL -->
+    <div id="auth-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-xl p-5 w-full max-w-xs shadow-xl border">
+            <h3 class="text-sm font-bold mb-3 text-slate-800">🔒 Yönetici Şifre Doğrulama</h3>
+            <input type="password" id="auth-sifre" class="w-full p-2.5 border rounded-lg text-sm mb-3 outline-none focus:ring-2 focus:ring-blue-500" placeholder="Şifrenizi girin">
+            <div class="flex gap-2">
+                <button onclick="authModaliKapat()" class="flex-1 bg-slate-100 text-slate-600 py-2 rounded-lg text-xs font-bold">İptal</button>
+                <button onclick="sifreKontrol()" class="flex-1 bg-blue-600 text-white py-2 rounded-lg text-xs font-bold">Giriş Yap</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tanımlı Şifre
+        const ADMIN_PASSWORD = "5S_Admin_2026";
+        let isAdmin = false;
+
+        // Kurumsal Hiyerarşi Listesi
+        const hatlar = {
+            "MACRO LABORATUVAR": { ekipLideri: "MEHMET KÖMÜRCÜ", birimLideri: "ERHAN ERBUCAN", mudur: "TUNCAY ASLAN" },
+            "ŞÜPHELİ ALANLAR / PROSES KALİTE / FORD FIREWALL ALANI": { ekipLideri: "MEHMET KÖMÜRCÜ", birimLideri: "ERHAN ERBUCAN", mudur: "TUNCAY ASLAN" },
+            "MCA / LCA / TOYOTA FIREWALL / PROSES KALİTE": { ekipLideri: "MEHMET KÖMÜRCÜ", birimLideri: "ERHAN ERBUCAN", mudur: "TUNCAY ASLAN" },
+            "TOYOTA FIREWALL": { ekipLideri: "MEHMET KÖMÜRCÜ", birimLideri: "ERHAN ERBUCAN", mudur: "TUNCAY ASLAN" },
+            "MCA / LCA": { ekipLideri: "VOLKAN KARAKAYA", birimLideri: "KAMIL CANDAR", mudur: "MUSTAFA BAHADIR" },
+            "BX726 / RTB": { ekipLideri: "VOLKAN KARAKAYA", birimLideri: "KAMIL CANDAR", mudur: "MUSTAFA BAHADIR" },
+            "BX726 / FCM": { ekipLideri: "VOLKAN KARAKAYA", birimLideri: "KAMIL CANDAR", mudur: "MUSTAFA BAHADIR" },
+            "BX726 BURÇ ÇAKMA / MCA / BEV": { ekipLideri: "VOLKAN KARAKAYA", birimLideri: "KAMIL CANDAR", mudur: "MUSTAFA BAHADIR" },
+            "TOYOTA DEPO KAPAĞI": { ekipLideri: "SAMET MEMİŞ", birimLideri: "CEREN KARA PERVANLAR", mudur: "MUSTAFA BAHADIR" },
+            "TOYOTA KAYNAK HÜCRELERİ": { ekipLideri: "SAMET MEMİŞ", birimLideri: "CEREN KARA PERVANLAR", mudur: "MUSTAFA BAHADIR" },
+            "TOYOTA BURÇ ÇAKMA": { ekipLideri: "SAMET MEMİŞ", birimLideri: "CEREN KARA PERVANLAR", mudur: "MUSTAFA BAHADIR" },
+            "MAKİNA BAKIM": { ekipLideri: "RESUL AKTAŞ", birimLideri: "BAYRAM KEÇE", mudur: "ÖMER PALA" },
+            "BOYAHANE": { ekipLideri: "MEDİNE YILDIZ", birimLideri: "YEKTA YILDIRIM", mudur: "MUSTAFA BAHADIR" },
+            "İÇ LOJİSTİK": { ekipLideri: "MEHMET KARATAŞ", birimLideri: "İSA ODABAŞI", mudur: "BUĞRA BİNGÖL" },
+            "İNSAN KAYNAKLARI": { ekipLideri: "MUHAMMET HANBABA", birimLideri: "MUHAMMET HANBABA", mudur: "BAHADDİN ERSOY" }
+        };
+
+        // 5S Adımları Yapısı
+        const 	kategoriler5S = {
+            S1: "1.ADIM: GEREKSİZLERİ KALDIR (Seiri)",
+            S2: "2.ADIM: DÜZENLE (Seiton)",
+            S3: "3.ADIM: TEMİZLE (Seiso)",
+            S4: "4.ADIM: STANDARTLAŞTIR (Seiketsu)",
+            S5: "5.ADIM: DİSİPLİN (Shitsuke)"
+        };
+
+        // LocalStorage Veritabanı Altyapısı
+        let kayitlar = JSON.parse(localStorage.getItem('5s_v3_kayitlar')) || [];
+        let trendChartInstance = null;
+
+        // Akıllı Metin Analizi Motoru (Kelime Dağarcığı Eşleştirme)
+        function akilliMetinAnalizi(metin) {
+            let m = metin.toLowerCase('tr-TR');
+            
+            // İş Güvenliği & Disiplin tetikleyicileri
+            if(m.includes('is güvenligi') || m.includes('kkd') || m.includes('gözlük') || m.includes('ayakkabi') || m.includes('kıyafet') || m.includes('maske') || m.includes('bariyer') || m.includes('yangın') || m.includes('keskin')) {
+                if(m.includes('yangın') || m.includes('bariyer') || m.includes('kablo')) {
+                    return { kat: "S4", kuralNo: 1, kuralAd: "İş Güvenliği & Yangın Söndürücü Kontrolü" };
+                }
+                return { kat: "S5", kuralNo: 1, kuralAd: "İş Güvenliği Kurallarına Uyum" };
+            }
+            
+            // Temizlik tetikleyicileri
+            if(m.includes('kir') || m.includes('pis') || m.includes('yağ') || m.includes('su') || m.includes('çapak') || m.includes('talaş') || m.includes('toz') || m.includes('yolluk') || m.includes('temiz değil') || m.includes('leke')) {
+                if(m.includes('yerler') || m.includes('duvar') || m.includes('cam') || m.includes('zemin')) {
+                    return { kat: "S3", kuralNo: 1, kuralAd: "Zemin, Duvar, Cam Temizliği" };
+                }
+                return { kat: "S3", kuralNo: 2, kuralAd: "Kirlilik Kaynakları Kontrolü" };
+            }
+
+            // Hata Kartı & SAP / QDMS tetikleyicileri
+            if(m.includes('hata kart') || m.includes('sap') || m.includes('qdms') || m.includes('ewo') || m.includes('smp')) {
+                return { kat: "S3", kuralNo: 3, kuralAd: "Otonom Bakım & Sistem Girişleri" };
+            }
+
+            // Düzen & Etiket tetikleyicileri
+            if(m.includes('etiket') || m.includes('tanım') || m.includes('çizgi') || m.includes('yürüme yolu') || m.includes('yerleş') || m.includes('masa') || m.includes('raf') || m.includes('çekmece') || m.includes('max-min') || m.includes('bulunmuyor')) {
+                if(m.includes('etiket') || m.includes('raf') || m.includes('çekmece') || m.includes('30 sn')) {
+                    return { kat: "S2", kuralNo: 2, kuralAd: "Etiketleme & 30 Saniye Standardı" };
+                }
+                return { kat: "S2", kuralNo: 1, kuralAd: "Yer Tanımlamaları & Çizgiler" };
+            }
+
+            // Fazlalık / Atıl Ekipman tetikleyicileri
+            if(m.includes('fazla') || m.includes('atıl') || m.includes('gereksiz') || m.includes('eski') || m.includes('kullanılmayan') || m.includes('hurda') || m.includes('dolap') || m.includes('kasa')) {
+                return { kat: "S1", kuralNo: 1, kuralAd: "Gereksiz/Atıl Ekipman Ayıklama" };
+            }
+
+            // Varsayılan olarak Genel Temizlik / Düzen ihlali
+            return { kat: "S1", kuralNo: 1, kuralAd: "Genel 5S İhlali" };
+        }
+
+        // Form Elemanlarını Doldur
+        function bileşenleriDoldur() {
+            const selectQr = document.getElementById('qr-hat');
+            selectQr.innerHTML = Object.keys(hatlar).map(h => `<option value="${h}">${h}</option>`).join('');
+        }
+
+        // QR Uygunsuzluk Kaydı (Mavi Yaka / Sahadan Giriş)
+        function qrBildirimKaydet(e) {
+            e.preventDefault();
+            const hat = document.getElementById('qr-hat').value;
+            const metin = document.getElementById('qr-metin').value;
+            const fotoInput = document.getElementById('qr-foto');
+
+            // Akıllı eşleştirme motoru çalışıyor
+            const analiz = akilliMetinAnalizi(metin);
+
+            let yeniBildirim = {
+                id: Date.now(),
+                hat: hat,
+                metin: metin,
+                katKod: analiz.cat || analiz.kat,
+                kategoriAd: kategoriler5S[analiz.kat],
+                kuralAd: analiz.kuralAd,
+                durum: "AÇIK", // Onay/Kapatma bekliyor
+                sorumlu: hatlar[hat].birimLideri,
+                hedefTarih: "--",
+                tarih: new Date().toLocaleDateString('tr-TR'),
+                foto: ""
+            };
+
+            if (fotoInput.files && fotoInput.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    yeniBildirim.foto = event.target.result;
+                    kayitlar.push(yeniBildirim);
+                    kaydetVeYenile();
+                };
+                reader.readAsDataURL(fotoInput.files[0]);
+            } else {
+                kayitlar.push(yeniBildirim);
+                kaydetVeYenile();
+            }
+
+            document.getElementById('qr-formu').reset();
+            alert("Uygunsuzluk başarıyla sisteme aktarıldı. Analiz Edilen Sınıf: " + yeniBildirim.kategoriAd);
+        }
+
+        function kaydetVeYenile() {
+            localStorage.setItem('5s_v3_kayitlar', JSON.stringify(kayitlar));
+            arayuzuGuncelle();
+        }
+
+        // Hat Skorunu Hesaplama (Açık ceza maddesi varsa 100 üzerinden düşer)
+        function hatSkorHesapla(hatAdi) {
+            let acikCezalar = kayitlar.filter(k => k.hat === hatAdi && k.durum === "AÇIK");
+            // Her açık ceza maddesi hattın 100 tam puanından 25 puan kırar (Minimum 0)
+            let puan = 100 - (acikCezalar.length * 25);
+            return Math.max(0, puan);
+        }
+
+        function arayuzuGuncelle() {
+            // Mobil Skor Kartları Listesi
+            const mKonteyner = document.getElementById('mobil-hat-skorlari');
+            mKonteyner.innerHTML = '';
+            
+            for(let h in hatlar) {
+                let skor = hatSkorHesapla(h);
+                let renk = skor >= 85 ? 'text-emerald-600 bg-emerald-50' : (skor >= 60 ? 'text-amber-600 bg-amber-50' : 'text-rose-600 bg-rose-50');
+                mKonteyner.innerHTML += `
+                    <div class="p-2 rounded-lg border border-slate-100 bg-slate-50/50 flex justify-between items-center">
+                        <span class="font-medium text-slate-700 truncate mr-1 max-w-[120px]">${h}</span>
+                        <span class="font-black px-1.5 py-0.5 rounded text-[11px] ${renk}">${skor}</span>
+                    </div>`;
+            }
+
+            // Aksiyon Listesi Güncelleme (Sadece Admin Görür)
+            const aKonteyner = document.getElementById('aksiyon-listesi-konteyner');
+            let acikKayitlar = kayitlar.filter(k => k.durum === "AÇIK");
+            document.getElementById('badge-aksiyon-sayi').innerText = acikKayitlar.length;
+            
+            aKonteyner.innerHTML = acikKayitlar.length === 0 ? `<p class="text-xs text-slate-400 italic p-4 text-center">Aktif veya açık uygunsuzluk bulunmamaktadır.</p>` : '';
+
+            acikKayitlar.forEach(k => {
+                aKonteyner.innerHTML += `
+                    <div class="bg-white p-3 rounded-lg border border-l-4 border-amber-500 shadow-sm space-y-2 text-xs">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h4 class="font-bold text-slate-800 text-sm">${k.hat}</h4>
+                                <p class="text-[10px] text-slate-400">Bildirim Tarihi: ${k.tarih} | Sorumlu Lider: ${k.sorumlu}</p>
+                            </div>
+                            <span class="bg-rose-100 text-rose-800 px-2 py-0.5 rounded font-bold text-[10px] uppercase">${k.katKod || '5S'}</span>
+                        </div>
+                        <p class="text-slate-600 bg-slate-50 p-2 rounded border border-dashed"><b class="text-slate-800">Bulgu:</b> ${k.metin}</p>
+                        <div class="text-[10px] text-indigo-700 font-semibold">📍 Otomatik Algılanan Kriter: ${k.kuralAd}</div>
+                        ${k.foto ? `<img src="${k.foto}" class="w-20 h-20 object-cover rounded border">` : ''}
+                        
+                        <div class="flex gap-2 pt-1 border-t items-center justify-end">
+                            <div class="flex items-center gap-1 mr-auto">
+                                <span class="text-[10px] text-slate-400">Termin:</span>
+                                <input type="date" id="t-date-${k.id}" value="${k.hedefTarih !== '--' ? k.hedefTarih : ''}" onchange="terminGuncelle(${k.id}, this.value)" class="p-1 border rounded text-[11px]">
+                            </div>
+                            <button onclick="aksiyonKapat(${k.id})" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-3 py-1 rounded text-[11px] shadow">
+                                ✓ Kapat (Onayla)
+                            </button>
+                        </div>
+                    </div>`;
+            });
+
+            if(isAdmin) yoneticiPaneliniHesapla();
+        }
+
+        function terminGuncelle(id, val) {
+            let idx = kayitlar.findIndex(k => k.id === id);
+            if(idx !== -1) {
+                kayitlar[idx].hedefTarih = val;
+                localStorage.setItem('5s_v3_kayitlar', JSON.stringify(kayitlar));
+            }
+        }
+
+        function aksiyonKapat(id) {
+            let idx = kayitlar.findIndex(k => k.id === id);
+            if(idx !== -1) {
+                kayitlar[idx].durum = "KAPALI";
+                kaydetVeYenile();
+            }
+        }
+
+        // Yönetici Ekran Veri Hesaplamaları
+        function yoneticiPaneliniHesapla() {
+            let tPuan = 0, hSayisi = 0, birimGruplari = {};
+            let acikAksiyonlar = kayitlar.filter(k => k.durum === "AÇIK").length;
+
+            for (let h in hatlar) {
+                let p = hatSkorHesapla(h);
+                tPuan += p; hSayisi++;
+                let bl = hatlar[h].birimLideri;
+                if(!birimGruplari[bl]) birimGruplari[bl] = { name: bl, mudur: hatlar[h].mudur, hatlar: [], score: 0 };
+                birimGruplari[bl].hatlar.push(h); birimGruplari[bl].score += p;
+            }
+
+            document.getElementById('genel-ortalama-puan').innerText = Math.round(tPuan / hSayisi) + " Puan";
+            document.getElementById('yonetim-toplam-acik').innerText = acikAksiyonlar;
+
+            const hiyerarsiTablo = document.getElementById('yonetici-hiyerarsi-tablo');
+            hiyerarsiTablo.innerHTML = '';
+
+            for(let key in birimGruplari) {
+                let ort = Math.round(birimGruplari[key].score / birimGruplari[key].hatlar.length);
+                let rozet = ort >= 85 ? '<span class="bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded text-[10px] font-bold">OK</span>' : '<span class="bg-rose-100 text-rose-800 px-1.5 py-0.5 rounded text-[10px] font-bold">RİSK</span>';
+
+                hiyerarsiTablo.innerHTML += `
+                    <tr class="border-b hover:bg-slate-50/50">
+                        <td class="p-2 font-bold text-slate-800">${birimGruplari[key].name}</td>
+                        <td class="p-2 font-black text-center text-indigo-700">${ort}</td>
+                        <td class="p-2 text-center">${rozet}</td>
+                    </tr>`;
+            }
+            grafikYenile(birimGruplari);
+        }
+
+        function grafikYenile(birimGruplari) {
+            let labels = Object.keys(birimGruplari);
+            let values = labels.map(l => Math.round(birimGruplari[l].score / birimGruplari[l].hatlar.length));
+            const canvas = document.getElementById('trendChart');
+            if(!canvas) return;
+            if (trendChartInstance) trendChartInstance.destroy();
+
+            trendChartInstance = new Chart(canvas.getContext('2d'), {
+                type: 'bar',
+                data: { labels: labels, datasets: [{ label: 'Birim Ortalama 5S Skoru', data: values, backgroundColor: '#4f46e5', borderRadius: 4 }] },
+                options: { responsive: true, maintainAspectRatio: false, scales: { y: { min: 0, max: 100 } } }
+            });
+        }
+
+        // Yetkilendirme & Şifre Yönetimi
+        function authModaliAc() { document.getElementById('auth-modal').classList.remove('hidden'); }
+        function authModaliKapat() { document.getElementById('auth-modal').classList.add('hidden'); document.getElementById('auth-sifre').value = ''; }
+        
+        function sifreKontrol() {
+            const girilen = document.getElementById('auth-sifre').value;
+            if(girilen === ADMIN_PASSWORD) {
+                isAdmin = true;
+                document.getElementById('yonetici-tablari').classList.remove('hidden');
+                document.getElementById('btn-login-toggle').classList.add('hidden');
+                document.getElementById('btn-logout').classList.remove('hidden');
+                authModaliKapat();
+                sekmeDegistir('aksiyon');
+            } else {
+                alert("Hatalı yönetim şifresi girdiniz!");
+            }
+        }
+
+        function cikisYap() {
+            isAdmin = false;
+            document.getElementById('yonetici-tablari').classList.add('hidden');
+            document.getElementById('btn-login-toggle').classList.remove('hidden');
+            document.getElementById('btn-logout').classList.add('hidden');
+            sekmeDegistir('qr');
+        }
+
+        function sekmeDegistir(hedef) {
+            document.getElementById('sayfa-qr').classList.toggle('hidden', hedef !== 'qr');
+            document.getElementById('sayfa-aksiyon').classList.toggle('hidden', hedef !== 'aksiyon');
+            document.getElementById('sayfa-rapor').classList.toggle('hidden', hedef !== 'rapor');
+            
+            // Tab Buton Renk Yönetimi
+            document.getElementById('tab-qr').className = hedef === 'qr' ? 'flex-1 text-center py-2 rounded-md font-bold text-xs bg-white text-blue-600 shadow-sm' : 'flex-1 text-center py-2 text-slate-600 font-bold text-xs';
+            document.getElementById('tab-aksiyon').className = hedef === 'aksiyon' ? 'flex-1 text-center py-2 rounded-md font-bold text-xs bg-white text-blue-600 shadow-sm' : 'flex-1 text-center py-2 text-slate-600 font-bold text-xs';
+            document.getElementById('tab-rapor').className = hedef === 'rapor' ? 'flex-1 text-center py-2 rounded-md font-bold text-xs bg-white text-blue-600 shadow-sm' : 'flex-1 text-center py-2 text-slate-600 font-bold text-xs';
+            
+            arayuzuGuncelle();
+        }
+
+        window.onload = () => { bileşenleriDoldur(); arayuzuGuncelle(); };
+    </script>
+</body>
+</html>

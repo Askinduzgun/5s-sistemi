@@ -3,22 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Resmi 5S Checklist & Akıllı Denetim Paneli</title>
+    <title>Resmi 5S Akıllı Denetim Paneli</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- FIREBASE KÜTÜPHANELERİ -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 </head>
-<body class="bg-slate-100 font-sans antialiased text-slate-800 pb-12">
+<body class="bg-slate-50 font-sans antialiased text-slate-800 pb-12">
 
     <!-- TOP BAR -->
-    <div class="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white px-4 py-3 flex justify-between items-center shadow-lg sticky top-0 z-50">
+    <div class="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white px-4 py-3 flex justify-between items-center shadow-md sticky top-0 z-50">
         <div class="flex items-center gap-2">
             <span class="text-2xl">📋</span>
             <div>
-                <span class="font-black text-sm tracking-wider block">5S QUESTION CHECKLIST SYSTEM</span>
-                <span class="text-[10px] text-indigo-300 block font-medium -mt-1">GÖRSELDEKİ RESMİ MATRİS ENTEGRASYONU</span>
+                <span class="font-black text-sm tracking-wider block">5S AKILLI DENETİM SİSTEMİ</span>
+                <span class="text-[10px] text-indigo-300 block font-medium -mt-1">ARKA PLAN ÇOKLU MADDESEL MOTOR V3.0</span>
             </div>
         </div>
         <div>
@@ -34,12 +34,12 @@
     <div class="max-w-5xl mx-auto px-3 mt-4">
         
         <!-- HEADER -->
-        <header class="mb-4 bg-white p-5 rounded-2xl shadow-sm border border-slate-200/60 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+        <header class="mb-4 bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
             <div>
                 <h1 class="text-2xl font-black text-slate-900 tracking-tight">
-                    5S Soru Checklist Portalı <span class="bg-amber-100 text-amber-800 text-xs font-extrabold px-2 py-0.5 rounded-full">Resmi Matris</span>
+                    5S Saha Bildirim Portalı
                 </h1>
-                <p class="text-xs text-slate-500 mt-0.5">0.0 (Çok Yetersiz), 2.5 (Yeterli) ve 5.0 (Oldukça Yeterli) standart puanlama altyapısı.</p>
+                <p class="text-xs text-slate-500 mt-0.5">Saha personeli bulguyu girer; tüm ihlal edilen maddeler ve cezalar arka planda kümülatif hesaplanır.</p>
             </div>
             
             <div id="yonetici-tablari" class="flex flex-wrap bg-slate-100 p-1.5 rounded-xl border border-slate-200 gap-1 min-w-[320px]">
@@ -48,9 +48,6 @@
                 </button>
                 <button id="tab-canli-skor" onclick="sekmeDegistir('canli-skor')" class="flex-1 text-center py-2.5 rounded-lg font-bold text-xs transition-all text-slate-600">
                     📊 Canlı Skorboard
-                </button>
-                <button id="tab-puanlama" onclick="sekmeDegistir('puanlama')" class="flex-1 text-center py-2.5 rounded-lg font-bold text-xs transition-all text-slate-600">
-                    📋 5S Soru Listesi
                 </button>
                 <button id="tab-aksiyon" onclick="sekmeDegistir('aksiyon')" class="flex-1 text-center py-2.5 rounded-lg font-bold text-xs transition-all text-slate-600">
                     ⚠️ Aksiyonlar (<span id="badge-aksiyon-sayi">0</span>)
@@ -66,12 +63,12 @@
 
         <!-- 1. BİLDİRİM FORMU -->
         <div id="sayfa-qr" class="block space-y-4">
-            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200/60">
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
                 <div class="flex items-center gap-2 border-b pb-3 mb-5">
                     <span class="text-xl">✍️</span>
                     <div>
                         <h2 class="text-base font-bold text-slate-900">Saha Uygunsuzluk Tespit Formu</h2>
-                        <p class="text-[11px] text-slate-400">Bulgular AI tarafından resmi kontrol listesi sorularıyla otomatik eşleştirilir.</p>
+                        <p class="text-[11px] text-slate-400">Yapay zeka, yazdığınız ifadeden birden fazla 5S ihlali algılarsa puanları birleştirerek yansıtır.</p>
                     </div>
                 </div>
                 
@@ -94,7 +91,7 @@
 
                     <div>
                         <label class="block text-slate-700 font-bold mb-1 text-xs uppercase tracking-wider">Görülen Uygunsuzluk / Kusur Özeti</label>
-                        <textarea id="qr-metin" rows="3" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Örn: BX726 hattında zeminlerde yağ sızıntısı var veya acil çıkış kapısının önü paletle kapatılmış..." required></textarea>
+                        <textarea id="qr-metin" rows="4" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-indigo-500 font-medium leading-relaxed" placeholder="Örn: Hücrede açık elektrik kabloları var (Q15), ayrıca zemin yağ sızıntısı sebebiyle çok kirli (Q12)..." required></textarea>
                     </div>
 
                     <div>
@@ -112,76 +109,93 @@
                     </div>
 
                     <button type="submit" class="w-full bg-gradient-to-r from-indigo-600 to-indigo-700 text-white font-black py-3.5 px-4 rounded-xl text-sm shadow-md transition-all">
-                        🚀 AI Resmi Soru Listesiyle Eşleştir ve Gönder
+                        🚀 Gönder (Çoklu Madde Analiz Et)
                     </button>
                 </form>
             </div>
         </div>
 
-        <!-- 2. AYRI CANLI SKORBOARD SEKRESİ -->
+        <!-- 2. CANLI SKORBOARD -->
         <div id="sayfa-canli-skor" class="hidden space-y-4">
-            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200/60">
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
                 <div class="flex items-center gap-2 border-b pb-3 mb-4">
                     <span class="text-xl">📊</span>
                     <div>
                         <h2 class="text-base font-bold text-slate-900">Güncel Sahaların 5S Takip Panosu</h2>
-                        <p class="text-[11px] text-slate-400">Onaylanan uygunsuzluklarda 0.0 alan sorulardan dolayı düşen canlı skorlar.</p>
+                        <p class="text-[11px] text-slate-400">Çoklu maddelerden kesilen kümülatif cezaların canlı yansıması.</p>
                     </div>
                 </div>
                 <div id="mobil-hat-skorlari" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 text-xs"></div>
             </div>
         </div>
 
-        <!-- 3. RESMİ 5S PUANLAMA LİSTESİ SEKRESİ -->
-        <div id="sayfa-puanlama" class="hidden space-y-4">
-            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200/60">
-                <div class="flex items-center gap-2 border-b pb-3 mb-4">
-                    <span class="text-xl">📋</span>
+        <!-- 3. AKSİYON TAKİP SİSTEMİ (FİLTRELEMELİ) -->
+        <div id="sayfa-aksiyon" class="hidden space-y-4">
+            <!-- Dinamik Arama ve Filtreleme Paneli -->
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 space-y-3">
+                <div class="flex items-center justify-between border-b pb-2.5">
+                    <h3 class="text-xs font-black text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                        <span>🔍</span> Bulgu Filtreleme ve Arama Paneli
+                    </h3>
+                    <button onclick="filtreleriTemizle()" class="text-[10px] font-bold text-indigo-600 hover:text-indigo-800 transition-all">
+                        Filtreleri Sıfırla ↩
+                    </button>
+                </div>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     <div>
-                        <h2 class="text-base font-bold text-slate-900">Resmi 5S Soru Checklist Kontrol Matrisi</h2>
-                        <p class="text-[11px] text-slate-400">Görselde yer alan 5 Adım ve 20 Resmi Denetim Maddesi.</p>
+                        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Hat / Alan Süzgeci</label>
+                        <select id="filtre-hat" onchange="arayuzuGuncelle()" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:ring-2 focus:ring-indigo-500 outline-none">
+                            <option value="">Tüm Hatlar/Alanlar</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Birim Sorumlusu Süzgeci</label>
+                        <select id="filtre-lider" onchange="arayuzuGuncelle()" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:ring-2 focus:ring-indigo-500 outline-none">
+                            <option value="">Tüm Birim Liderleri</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Kategori ve İSG Önceliği</label>
+                        <select id="filtre-tur" onchange="arayuzuGuncelle()" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:ring-2 focus:ring-indigo-500 outline-none">
+                            <option value="TUM">Tüm Bulgular</option>
+                            <option value="ISG">🚨 Sadece Kritik İSG Bulguları (Q4, Q15, Q19)</option>
+                            <option value="TEKERRUR">⚠️ Sadece Tekerrür Eden İhlaller</option>
+                            <option value="KAPAMA">⌛ Kapama Onayı Bekleyenler</option>
+                        </select>
                     </div>
                 </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-xs border-collapse">
-                        <thead>
-                            <tr class="bg-slate-900 text-white font-bold border-b">
-                                <th class="p-3 rounded-l-xl">Soru No</th>
-                                <th class="p-3">5S Adımı</th>
-                                <th class="p-3">Kontrol Edilecek Husus / Madde İçeriği</th>
-                                <th class="p-3 text-center rounded-r-xl">Kritik Ceza Ağırlığı</th>
-                            </tr>
-                        </thead>
-                        <tbody id="resmi-kriter-tablo-body" class="divide-y divide-slate-100 text-slate-600 font-medium"></tbody>
-                    </table>
-                </div>
             </div>
-        </div>
 
-        <!-- 4. AKSİYON TAKİP SİSTEMİ -->
-        <div id="sayfa-aksiyon" class="hidden space-y-4">
-            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/60">
-                <h2 class="text-base font-bold text-slate-900 border-b pb-2 mb-4 flex items-center gap-2">
-                    <span class="w-2 h-5 bg-rose-500 rounded-full"></span> Sahadaki Aktif Açık Bulgular (Düzeltme Bekleyenler)
+            <!-- Bulguların Listelendiği Alan -->
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
+                <h2 class="text-base font-bold text-slate-900 border-b pb-2 mb-4 flex items-center justify-between">
+                    <span class="flex items-center gap-2">
+                        <span class="w-2 h-5 bg-rose-500 rounded-full"></span> 
+                        Sahadaki Aktif Açık Bulgular
+                    </span>
+                    <span class="text-xs text-slate-400 font-medium">
+                        Eşleşen: <b id="filtre-eslesen-sayi" class="text-rose-600 font-black">0</b> bulgu
+                    </span>
                 </h2>
                 <div id="aksiyon-listesi-konteyner" class="space-y-3"></div>
             </div>
         </div>
 
-        <!-- 5. ADMIN ONAY HAVUZU -->
+        <!-- 4. ADMIN ONAY HAVUZU -->
         <div id="sayfa-onay" class="hidden space-y-4">
-            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/60">
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
                 <h2 class="text-base font-bold text-slate-900 border-b pb-2 mb-4 flex items-center gap-2">
-                    <span class="w-2 h-5 bg-indigo-600 rounded-full"></span> AI Tarafından Soru Eşleştirmesi Yapılmış Onay Havuzu
+                    <span class="w-2 h-5 bg-indigo-600 rounded-full"></span> AI Tarafından Sınıflandırılan Talepler Onay Havuzu
                 </h2>
                 <div id="onay-havuzu-konteyner" class="space-y-4"></div>
             </div>
         </div>
 
-        <!-- 6. ANALİTİK DASHBOARD RAPORLAR -->
+        <!-- 5. ANALİTİK DASHBOARD -->
         <div id="sayfa-rapor" class="hidden space-y-6">
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                <div class="bg-indigo-900 text-white p-4 rounded-2xl shadow-md">
+                <div class="bg-slate-900 text-white p-4 rounded-2xl shadow-md">
                     <p class="text-indigo-200 text-[10px] font-bold uppercase tracking-wider">FABRİKA GENEL ORT.</p>
                     <h3 id="genel-ortalama-puan" class="text-3xl font-black mt-1">--</h3>
                 </div>
@@ -201,19 +215,19 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div class="bg-white p-5 rounded-2xl border shadow-sm">
-                    <h3 class="text-xs font-black text-slate-400 uppercase mb-4">📊 Birim Sorumluları Sıralaması</h3>
-                    <div style="height: 220px; position: relative;"><canvas id="trendChart"></canvas></div>
+                    <h3 class="text-xs font-black text-slate-400 uppercase mb-4">📊 Birim Sorumluları Başarı Sıralaması</h3>
+                    <div style="height: 240px; position: relative;"><canvas id="trendChart"></canvas></div>
                 </div>
                 <div class="bg-white p-5 rounded-2xl border shadow-sm">
-                    <h3 class="text-xs font-black text-slate-400 uppercase mb-4">🍩 5S Adımlarına Göre Dağılım</h3>
-                    <div style="height: 220px; position: relative;" class="flex justify-center"><canvas id="donutChart"></canvas></div>
+                    <h3 class="text-xs font-black text-slate-400 uppercase mb-4">🍩 İhlal Edilen 5S Adımları Dağılımı</h3>
+                    <div style="height: 240px; position: relative;" class="flex justify-center"><canvas id="donutChart"></canvas></div>
                 </div>
             </div>
 
             <!-- DETAYLI RAPOR TABLOSU -->
             <div class="bg-white p-5 rounded-2xl border shadow-sm overflow-x-auto">
                 <div class="flex justify-between items-center mb-3">
-                    <h3 class="text-sm font-black text-slate-900">📋 Denetim Günlüğü Güncel Log Listesi</h3>
+                    <h3 class="text-sm font-black text-slate-900">📋 Denetim Günlüğü Canlı Log Listesi</h3>
                     <button onclick="excelDosyasiAl()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-3.5 py-1.5 rounded-xl transition-all shadow">
                         📥 Excel İndir
                     </button>
@@ -224,8 +238,8 @@
                             <th class="p-3">Tarih</th>
                             <th class="p-3">Denetçi</th>
                             <th class="p-3">Hat / Alan</th>
-                            <th class="p-3">İlişkili Checklist Sorusu</th>
-                            <th class="p-3">Puanlama</th>
+                            <th class="p-3">Kapsadığı Maddeler</th>
+                            <th class="p-3">Toplam Ceza</th>
                             <th class="p-3">Durum</th>
                             <th class="p-3 text-center">Görsel</th>
                         </tr>
@@ -235,6 +249,53 @@
             </div>
         </div>
 
+    </div>
+
+    <!-- FOTOĞRAF İNCELEME MODALİ -->
+    <div id="buyuk-foto-modal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md hidden flex items-center justify-center p-4 z-50 transition-all" onclick="buyukFotoKapat()">
+        <div class="relative max-w-3xl w-full flex flex-col items-center justify-center" onclick="event.stopPropagation()">
+            <button onclick="buyukFotoKapat()" class="absolute -top-10 right-0 text-white bg-white/10 hover:bg-white/20 w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm">✕</button>
+            <img id="modal-buyuk-gorsel" src="" class="max-h-[80vh] max-w-full object-contain rounded-xl shadow-2xl border border-white/10">
+        </div>
+    </div>
+
+    <!-- AKSİYON KAPAMA MODALİ -->
+    <div id="aksiyon-kapama-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-2xl p-6 w-full max-w-md shadow-xl border">
+            <h3 class="text-base font-black mb-1 text-slate-900">🔄 Aksiyon Kapatma Talebi Gönder</h3>
+            <p class="text-xs text-slate-500 mb-4">Maddelerin nasıl düzeltildiğine dair detayları girip kanıt fotoğrafı yükleyin.</p>
+            
+            <input type="hidden" id="kapama-key">
+            
+            <div class="space-y-4">
+                <div class="bg-indigo-50 p-2.5 rounded-xl border border-indigo-200 text-xs">
+                    <p class="font-bold text-indigo-900">🎯 Yapılması Gereken / Beklenen Aksiyonlar:</p>
+                    <p id="modal-beklenen-aksiyon" class="text-indigo-800 mt-0.5 italic whitespace-pre-line"></p>
+                </div>
+
+                <div>
+                    <label class="block text-slate-700 font-bold mb-1 text-xs uppercase tracking-wider">Yapılan İşlem / Düzeltme Açıklaması</label>
+                    <textarea id="kapama-aciklama" rows="3" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Alanda yapılan temizlik veya tamiratı yazın..." required></textarea>
+                </div>
+
+                <div>
+                    <label class="block text-slate-700 font-bold mb-1 text-xs uppercase tracking-wider">Düzeltilmiş Halinin Fotoğrafı</label>
+                    <label class="flex flex-col items-center justify-center w-full h-24 border-2 border-slate-300 border-dashed rounded-xl cursor-pointer bg-slate-50 hover:bg-slate-100 transition-all">
+                        <div class="flex flex-col items-center justify-center pt-3 pb-3">
+                            <span class="text-xl mb-1">📸</span>
+                            <p class="text-xs text-slate-500 font-bold">Yeni Kanıt Fotoğrafı Çek</p>
+                            <p id="kapama-foto-durum" class="text-[9px] text-slate-400 mt-1">Dosya seçilmedi</p>
+                        </div>
+                        <input type="file" id="kapama-foto" accept="image/*" capture="environment" class="hidden" onchange="kapamaFotoSecildi(this)" required />
+                    </label>
+                </div>
+            </div>
+
+            <div class="flex gap-2 mt-5">
+                <button onclick="aksiyonKapamaModaliKapat()" class="flex-1 bg-slate-100 text-slate-600 py-2.5 rounded-xl text-xs font-bold">Vazgeç</button>
+                <button onclick="aksiyonKapamaTalebiGonder()" class="flex-1 bg-indigo-600 text-white py-2.5 rounded-xl text-xs font-bold">Kapatma Talebi Yolla</button>
+            </div>
+        </div>
     </div>
 
     <!-- AUTH MODAL -->
@@ -279,35 +340,29 @@
             "İNSAN KAYNAKLARI": { birimLideri: "MUHAMMET HANBABA" }
         };
 
-        // GÖRSELDEKİ RESMİ 5S CHECKLIST SORULARI VE YAPILARI
         const resmiChecklist = {
-            "Q1": { adim: "1. ADIM: GEREKSİZLERİ KALDIR", soru: "Çalışma alanında kullanılmayan makine/ekipman, dolap, yardımcı alet, kasa vb. malzeme var mı?", agirlik: 5 },
-            "Q2": { adim: "1. ADIM: GEREKSİZLERİ KALDIR", soru: "Hat başında 1 vardiyanın üzerinde malzeme vb. var mı? (Küçük malzemeler hariç)", agirlik: 5 },
-            "Q3": { adim: "1. ADIM: GEREKSİZLERİ KALDIR", soru: "Bir önceki denetimde çıkan eksik noktalarla ilgili faaliyet tamamlanmış mı? Uygun olmayan termin verilmiş mi?", agirlik: 5 },
-            "Q4": { adim: "1. ADIM: GEREKSİZLERİ KALDIR", soru: "Alanda Majör İş Güvenliği Riski mevcut mu? (Örn: Robotik hücre içi kural dışı giriş vb.)", agirlik: 5 },
-            "Q5": { adim: "1. ADIM: GEREKSİZLERİ KALDIR", soru: "Çalışma alanında güncel olmayan bilgi ve dokümanlar var mı? Kalibrasyon tarihleri güncel mi?", agirlik: 5 },
-            
-            "Q6": { adim: "2. ADIM: DÜZENLE", soru: "Hareketli malzeme ve ekipmanlar için genel yer tanımlamaları yapılmış mı? (Kasa, palet, forklift yolları vb.)", agirlik: 5 },
-            "Q7": { adim: "2. ADIM: DÜZENLE", soru: "Raflarda, çekmecelerde ve dolaplarda tanımlı etiketler var mı? Standart renk kodları kullanılmış mı?", agirlik: 5 },
-            "Q8": { adim: "2. ADIM: DÜZENLE", soru: "Aranan malzeme kısa sürede (30 sn) bulunabiliyor mu? Stok alanları min-max seviyeleri belli mi?", agirlik: 5 },
-            "Q9": { adim: "2. ADIM: DÜZENLE", soru: "Alet ve ekipmanların bulunması ve kullanılması kullanım sıklığına göre ergonomik düzenlenmiş mi?", agirlik: 5 },
-            "Q10": { adim: "2. ADIM: DÜZENLE", soru: "Kullanılan sehpa, kasa, fikstür, lojistik ekipman hasar görmüş mü? HATA KARTI yönetimi var mı?", agirlik: 5 },
-            
-            "Q11": { adim: "3. ADIM: TEMİZLE", soru: "Yerler, duvarlar, camlar temiz mi? Zeminde hasar, kırılma var mı?", agirlik: 5 },
-            "Q12": { adim: "3. ADIM: TEMİZLE", soru: "Çalışma alanında kirlilik kaynakları var mı? (Yağ, su, çapak, toz, sıvı sızıntıları vb.)", agirlik: 5 },
-            "Q13": { adim: "3. ADIM: TEMİZLE", soru: "Hatalar takip ediliyor mu? QDMS / SAP sistemine giriş yapılmış mı? Operatör hata kartı açıyor mu?", agirlik: 5 },
-            "Q14": { adim: "3. ADIM: TEMİZLE", soru: "Temizlikte kullanılması gereken malzemeler için açıklama dolabı var mı? Ekipmanlar tanımlı mı?", agirlik: 5 },
-            
-            "Q15": { adim: "4. ADIM: STANDARTLAŞTIR", soru: "İŞ GÜVENLİĞİ riski oluşturan yerler var mı? (Keskin köşeler, açık kablolar, çalışmayan emniyet switchleri vb.)", agirlik: 5 },
-            "Q16": { adim: "4. ADIM: STANDARTLAŞTIR", soru: "Kritik hatalardan aksiyon alınmış mı? Kirlilik kaynaklarını kurutmaya yönelik faaliyetler var mı?", agirlik: 5 },
-            "Q17": { adim: "4. ADIM: STANDARTLAŞTIR", soru: "5S panosu var mı? Temizlik kontrol listesi, hata kartı takip listesi güncel şekilde asılmış mı?", agirlik: 5 },
-            "Q18": { adim: "4. ADIM: STANDARTLAŞTIR", soru: "İKY listeleri içeriğe uygun oluşturulmuş mu? Dokümanlar güncel mi?", agirlik: 5 },
-            
-            "Q19": { adim: "5. ADIM: DİSİPLİN", soru: "İŞ GÜVENLİĞİ kurallarına uyum tam mıdır? (İş kıyafeti, KKD kullanımı, amir ve lider takibi)", agirlik: 5 },
-            "Q20": { adim: "5. ADIM: DİSİPLİN", soru: "Hatta çalışanların 5S bilgisi yeterli mi? Eğitim ve kurallara bağlılık süreklilik gösteriyor mu?", agirlik: 5 }
+            "Q1": { adim: "1. GEREKSİZLERİ KALDIR", agirlik: 5, keywords: ['kullanılmayan','atıl','hurda','ekipman','dolap','atık'] },
+            "Q2": { adim: "1. GEREKSİZLERİ KALDIR", agirlik: 5, keywords: ['fazla malzeme','vardiya','hat başında','birikmiş'] },
+            "Q3": { adim: "1. GEREKSİZLERİ KALDIR", agirlik: 5, keywords: ['termin','önceki denetim','faaliyet tamam','eksik nokta'] },
+            "Q4": { adim: "1. GEREKSİZLERİ KALDIR", agirlik: 5, keywords: ['majör','isg','iş güvenliği','robot','hücre','koruyucu'] },
+            "Q5": { adim: "1. GEREKSİZLERİ KALDIR", agirlik: 5, keywords: ['kalibrasyon','doküman','güncel olmayan','tarihi geçmiş'] },
+            "Q6": { adim: "2. DÜZENLE", agirlik: 5, keywords: ['çizgi','yer tanımı','palet yeri','forklift yolu','sarı çizgi'] },
+            "Q7": { adim: "2. DÜZENLE", agirlik: 5, keywords: ['etiket','renk kodu','çekmece','raf','etiketsiz'] },
+            "Q8": { adim: "2. DÜZENLE", agirlik: 5, keywords: ['30 sn','arama','min-max','stok seviye'] },
+            "Q9": { adim: "2. DÜZENLE", agirlik: 5, keywords: ['ergonomik','ergonomi','alet düzeni','avadanlık'] },
+            "Q10": { adim: "2. DÜZENLE", agirlik: 5, keywords: ['hata kartı','hasar görmüş','fikstür','sehpa','hasarlı'] },
+            "Q11": { adim: "3. TEMİZLE", agirlik: 5, keywords: ['zemin kırık','duvar','yerler kirli','zemin hasar','tozlu'] },
+            "Q12": { adim: "3. TEMİZLE", agirlik: 5, keywords: ['yağ','sızıntı','çapak','kirlilik','su sızıntısı','sıvı','kirli'] },
+            "Q13": { adim: "3. TEMİZLE", agirlik: 5, keywords: ['qdms','sap','sistem kaydı','hata takibi'] },
+            "Q14": { adim: "3. TEMİZLE", agirlik: 5, keywords: ['temizlik malzemesi','mop','süpürge','temizlik dolabı'] },
+            "Q15": { adim: "4. STANDARTLAŞTIR", agirlik: 5, keywords: ['kablo','keskin','switch','emniyet bariyeri','açık kablo'] },
+            "Q16": { adim: "4. STANDARTLAŞTIR", agirlik: 5, keywords: ['kirlilik kaynağı','kurutma','iyileştirme'] },
+            "Q17": { adim: "4. STANDARTLAŞTIR", agirlik: 5, keywords: ['5s panosu','takip listesi','pano güncel'] },
+            "Q18": { adim: "4. STANDARTLAŞTIR", agirlik: 5, keywords: ['iky listesi','iky','doküman güncel'] },
+            "Q19": { adim: "5. DİSİPLİN", agirlik: 5, keywords: ['kkd','kıyafet','maske','gözlük','eldiven koruyucu'] },
+            "Q20": { adim: "5. DİSİPLİN", agirlik: 5, keywords: ['eğitim','bilgi yeterli','5s bilinci'] }
         };
 
-        // Firebase Canlı Dinleme Kancası
         db.ref("checklist_denetimler").on("value", (snapshot) => {
             const data = snapshot.val();
             kayitlar = [];
@@ -317,71 +372,154 @@
             arayuzuGuncelle();
         });
 
-        // AI Kelime Bazlı Resmi Soru Eşleştirme Motoru
-        function resmiSoruEsle(metin) {
+        // ÇOKLU MADDE VE KÜMÜLATİF PUANLAMA YAPAN MOTOR
+        function arkaPlanCokluMotor(metin) {
             let m = metin.toLowerCase('tr-TR');
-            // Varsayılan Soru Q11 (Genel Temizlik)
-            let qCode = "Q11"; 
+            let eslesenMaddeler = [];
+            let toplamCeza = 0;
+            let planlar = [];
 
-            if (m.includes('is güvenliği') || m.includes('robot') || m.includes('major') || m.includes('majör')) qCode = "Q4";
-            else if (m.includes('kalibrasyon') || m.includes('doküman') || m.includes('güncel olmayan bilgi')) qCode = "Q5";
-            else if (m.includes('fazla malzeme') || m.includes('vardiya') || m.includes('hat başında')) qCode = "Q2";
-            else if (m.includes('kullanılmayan') || m.includes('atıl') || m.includes('hurda') || m.includes('ekipman')) qCode = "Q1";
-            else if (m.includes('çizgi') || m.includes('yer tanımı') || m.includes('palet yeri') || m.includes('forklift yolu')) qCode = "Q6";
-            else if (m.includes('etiket') || m.includes('renk kodu') || m.includes('çekmece') || m.includes('raf')) qCode = "Q7";
-            else if (m.includes('30 sn') || m.includes('arama') || m.includes('min-max') || m.includes('seviye')) qCode = "Q8";
-            else if (m.includes('ergonomik') || m.includes('alet') || m.includes('avadanlık')) qCode = "Q9";
-            else if (m.includes('hata kartı') || m.includes('hasar görmüş') || m.includes('fikstür')) qCode = "Q10";
-            else if (m.includes('yağ') || m.includes('sızıntı') || m.includes('çapak') || m.includes('kirlilik')) qCode = "Q12";
-            else if (m.includes('qdms') || m.includes('sap') || m.includes('sistem')) qCode = "Q13";
-            else if (m.includes('dolap') || m.includes('temizlik malzemesi')) qCode = "Q14";
-            else if (m.includes('kablo') || m.includes('keskin') || m.includes('switch') || m.includes('emniyet')) qCode = "Q15";
-            else if (m.includes('pano') || m.includes('listesi asılmış')) qCode = "Q17";
-            else if (m.includes('kkd') || m.includes('kıyafet') || m.includes('maske') || m.includes('gözlük')) qCode = "Q19";
-            else if (m.includes('eğitim') || m.includes('bilgi yeterli')) qCode = "Q20";
+            for (let qId in resmiChecklist) {
+                let eslesmeVar = resmiChecklist[qId].keywords.some(kw => m.includes(kw));
+                if (eslesmeVar) {
+                    eslesenMaddeler.push(qId);
+                    toplamCeza += resmiChecklist[qId].agirlik; 
+                }
+            }
 
-            return qCode;
+            if (eslesenMaddeler.length === 0) {
+                eslesenMaddeler.push("Q10");
+                toplamCeza = 5;
+            }
+
+            if (m.includes('makaron') || m.includes('deforme') || m.includes('isg') || m.includes('iş güvenliği')) {
+                planlar.push("⚠️ [İSG]: Deforme olan koruyucuları yenileyin, hücre içi emniyeti sağlayın.");
+            }
+            if (m.includes('yağ') || m.includes('sızıntı') || m.includes('sıvı') || m.includes('kirli') || m.includes('toz')) {
+                planlar.push("💧 [KİRLİLİK]: Sızıntı alanını kurulayın, kaynağını tespit edip acil bakım kaydı açın.");
+            }
+            if (m.includes('kablo') || m.includes('keskin') || m.includes('switch')) {
+                planlar.push("⚡ [ELEKTRİK]: Açıkta duran kabloları izole edin ve emniyet kanallarına alın.");
+            }
+            if (m.includes('etiket') || m.includes('kasa') || m.includes('raf') || m.includes('çizgi')) {
+                planlar.push("🏷️ [DÜZEN]: Tanımsız malzemeleri ayıklayıp standart etiketleme kurallarını uygulayın.");
+            }
+
+            if(planlar.length === 0) {
+                planlar.push("🔧 [GENEL]: İlgili alandaki 5S standart dışı durumu giderecek aksiyonları başlatın.");
+            }
+
+            return {
+                maddeler: eslesenMaddeler.join(', '), 
+                ceza: toplamCeza,                     
+                aksiyon: "🚨 AI ÖNERİLEN AKSİYON PLANI:\n" + planlar.join('\n')
+            };
+        }
+
+        // SON 30 GÜNDEKİ TEKERRÜRLERİ GERÇEK ZAMANLI SORGULAYAN MOTOR
+        function hesaplaTekerrurVeKatliPuan(hatAdi, maddelerString) {
+            if (!maddelerString) return { nihaiCeza: 5, raporText: "Sistem Hatası: Maddesiz bildirim." };
+
+            const analizEdilecekMaddeler = maddelerString.split(',').map(s => s.trim());
+            const otuzGunMs = 30 * 24 * 60 * 60 * 1000;
+            const simdi = new Date();
+            
+            let toplamCezaPuani = 0;
+            let raporDetaylari = [];
+            let tetiklenenPlanlar = [];
+
+            analizEdilecekMaddeler.forEach(qId => {
+                const standartMaddeninCezasi = 5; 
+                
+                let gecmisIhlaller = kayitlar.filter(k => {
+                    if (k.durum === "ONAY BEKLİYOR" || k.hat !== hatAdi) return false;
+                    if (!k.tarih) return false;
+                    const p = k.tarih.split('.');
+                    const kGunu = new Date(p[2], p[1] - 1, p[0]);
+                    
+                    const zamanFarki = simdi - kGunu;
+                    if (zamanFarki > otuzGunMs || zamanFarki < 0) return false;
+
+                    return k.seciliSorular && k.seciliSorular.split(',').map(x => x.trim()).includes(qId);
+                });
+
+                let ihlalSayisi = gecmisIhlaller.length;
+                let nihaiKuralCezasi = standartMaddeninCezasi;
+                let durumYazisi = "İlk İhlal";
+
+                if (ihlalSayisi === 1) {
+                    nihaiKuralCezasi = standartMaddeninCezasi; 
+                    durumYazisi = "2. İhlal (Sarı Kart)";
+                } else if (ihlalSayisi >= 2) {
+                    nihaiKuralCezasi = standartMaddeninCezasi * 2; 
+                    durumYazisi = `🚨 TEKERRÜR! (Son 30 gündeki ${ihlalSayisi + 1}. ihlal)`;
+                    tetiklenenPlanlar.push(`⚠️ [${qId} - SÜRDÜRÜLEBİLİRLİK KRİZİ]: Bu madde son 30 günde bu alanda defalarca tekrar etti. 5 Neden Analizi yapılması zorunludur!`);
+                }
+
+                toplamCezaPuani += nihaiKuralCezasi;
+                raporDetaylari.push(`${qId}: ${durumYazisi} -> Kesilen: -${nihaiKuralCezasi}p`);
+            });
+
+            return {
+                nihaiCeza: toplamCezaPuani,
+                ekAksiyonlar: tetiklenenPlanlar.length > 0 ? "\n\n" + tetiklenenPlanlar.join('\n') : "",
+                raporText: raporDetaylari.join(' | ')
+            };
+        }
+
+        function filtreleriTemizle() {
+            document.getElementById('filtre-hat').value = "";
+            document.getElementById('filtre-lider').value = "";
+            document.getElementById('filtre-tur').value = "TUM";
+            arayuzuGuncelle();
         }
 
         function bileşenleriDoldur() {
-            // Seçim Listesini Doldur
+            // Bildirim formuna hatları yükle
             document.getElementById('qr-hat').innerHTML = Object.keys(hatlar).map(h => `<option value="${h}">${h}</option>`).join('');
+            
+            // Filtreleme paneline hatları yükle
+            document.getElementById('filtre-hat').innerHTML = `<option value="">Tüm Hatlar/Alanlar</option>` + 
+                Object.keys(hatlar).map(h => `<option value="${h}">${h}</option>`).join('');
 
-            // Puanlama Kriter Tablosunu Doldur
-            const tBody = document.getElementById('resmi-kriter-tablo-body');
-            tBody.innerHTML = '';
-            for(let q in resmiChecklist) {
-                tBody.innerHTML += `
-                    <tr class="hover:bg-slate-50 border-b">
-                        <td class="p-3 font-black text-slate-900">${q}</td>
-                        <td class="p-3 text-[11px] font-bold text-indigo-700">${resmiChecklist[q].adim}</td>
-                        <td class="p-3 text-slate-800 font-semibold">${resmiChecklist[q].soru}</td>
-                        <td class="p-3 text-center font-bold text-rose-600">0.0 (Çok Yetersiz Durumunda -${resmiChecklist[q].agirlik} Puan)</td>
-                    </tr>`;
-            }
+            // Filtreleme paneline eşsiz liderleri yükle
+            const liderler = [...new Set(Object.values(hatlar).map(v => v.birimLideri))];
+            document.getElementById('filtre-lider').innerHTML = `<option value="">Tüm Birim Liderleri</option>` + 
+                liderler.map(l => `<option value="${l}">${l}</option>`).join('');
         }
+
+        function buyukFotoAc(src) {
+            if(!src) return;
+            document.getElementById('modal-buyuk-gorsel').src = src;
+            document.getElementById('buyuk-foto-modal').classList.remove('hidden');
+        }
+        function buyukFotoKapat() { document.getElementById('buyuk-foto-modal').classList.add('hidden'); }
 
         function fotoSecildi(input) {
             const p = document.getElementById('foto-durum');
             if(input.files && input.files[0]) { p.innerText = "📸 Dosya Seçildi: " + input.files[0].name; p.className="text-[10px] text-emerald-600 font-bold mt-1"; }
         }
 
+        function kapamaFotoSecildi(input) {
+            const p = document.getElementById('kapama-foto-durum');
+            if(input.files && input.files[0]) { p.innerText = "📸 Kapama Fotoğrafı Seçildi: " + input.files[0].name; p.className="text-[10px] text-emerald-600 font-bold mt-1"; }
+        }
+
         function qrBildirimKaydet(e) {
             e.preventDefault();
             const hat = document.getElementById('qr-hat').value;
             const metin = document.getElementById('qr-metin').value;
-            const qCode = resmiSoruEsle(metin);
+            
+            const aiHesaplama = arkaPlanCokluMotor(metin);
 
             let yeniBildirim = {
                 personel: document.getElementById('qr-adsoyad').value.trim().toUpperCase('tr-TR'),
                 sicilNo: document.getElementById('qr-sicil').value.trim().toUpperCase('tr-TR'),
                 hat: hat,
                 metin: metin,
-                qId: qCode,
-                soruMetni: resmiChecklist[qCode].soru,
-                adimAdi: resmiChecklist[qCode].adim,
-                kirilanPuan: resmiChecklist[qCode].agirlik,
-                puanDurumu: "0.0 - ÇOK YETERSİZ", // Görseldeki standart kural
+                seciliSorular: aiHesaplama.maddeler, 
+                otomatikAksiyon: aiHesaplama.aksiyon, 
+                kirilanPuan: aiHesaplama.ceza,         
                 durum: "ONAY BEKLİYOR",
                 sorumlu: hatlar[hat].birimLideri,
                 tarih: new Date().toLocaleDateString('tr-TR'),
@@ -392,7 +530,7 @@
                 db.ref("checklist_denetimler").push(data);
                 document.getElementById('qr-formu').reset();
                 document.getElementById('foto-durum').innerText = "Dosya seçilmedi";
-                alert("Bulgu alındı, resmi 5S sorusu eşleştirildi ve onay havuzuna gönderildi!");
+                alert(`Uygunsuzluk ön havuza gönderildi!`);
             };
 
             const fotoInput = document.getElementById('qr-foto');
@@ -403,82 +541,228 @@
             } else { gonder(yeniBildirim); }
         }
 
-        // Skor Hesaplama Formülü: Başlangıç 100 Puan. Onaylanmış her "AÇIK" ihlal için 5 Puan Düşer.
         function hatSkorHesapla(hatAdi) {
-            let acikKusurlar = kayitlar.filter(k => k.hat === hatAdi && k.durum === "AÇIK");
+            let acikKusurlar = kayitlar.filter(k => k.hat === hatAdi && (k.durum === "AÇIK" || k.durum === "KAPAMA ONAYI BEKLİYOR"));
             let toplamDusulen = 0;
             acikKusurlar.forEach(c => { toplamDusulen += (c.kirilanPuan || 5); });
             return Math.max(0, 100 - toplamDusulen);
         }
 
+        function aksiyonKapamaModaliAc(key) {
+            const aksiyonVerisi = kayitlar.find(k => k.firebaseKey === key);
+            document.getElementById('kapama-key').value = key;
+            document.getElementById('modal-beklenen-aksiyon').innerText = aksiyonVerisi.otomatikAksiyon || "Belirtilmemiş.";
+            document.getElementById('kapama-aciklama').value = '';
+            document.getElementById('kapama-foto-durum').innerText = "Dosya seçilmedi";
+            document.getElementById('kapama-foto').value = '';
+            document.getElementById('aksiyon-kapama-modal').classList.remove('hidden');
+        }
+
+        function aksiyonKapamaModaliKapat() { document.getElementById('aksiyon-kapama-modal').classList.add('hidden'); }
+
+        function aksiyonKapamaTalebiGonder() {
+            const key = document.getElementById('kapama-key').value;
+            const aciklama = document.getElementById('kapama-aciklama').value.trim();
+            const fotoInput = document.getElementById('kapama-foto');
+
+            if(!aciklama) { alert("Açıklama zorunludur!"); return; }
+            if(!fotoInput.files || !fotoInput.files[0]) { alert("Fotoğraf zorunludur!"); return; }
+
+            const r = new FileReader();
+            r.onload = (ev) => {
+                db.ref("checklist_denetimler/" + key).update({
+                    durum: "KAPAMA ONAYI BEKLİYOR",
+                    kapamaAciklamasi: aciklama,
+                    kapamaFotosu: ev.target.result,
+                    kapamaTalepTarihi: new Date().toLocaleDateString('tr-TR')
+                });
+                aksiyonKapamaModaliKapat();
+                alert("Kapama talebi gönderildi, amir onayı bekleniyor.");
+            };
+            r.readAsDataURL(fotoInput.files[0]);
+        }
+
         function arayuzuGuncelle() {
-            // Canlı Skorboard Güncelleme (Ayrı Sekme)
+            // 1. Canlı Skorboard Güncelleme
             const skKonteyner = document.getElementById('mobil-hat-skorlari');
             skKonteyner.innerHTML = '';
             for(let h in hatlar) {
                 let s = hatSkorHesapla(h);
-                let rColor = s >= 85 ? 'text-emerald-700 bg-emerald-50 border-emerald-200' : (s >= 70 ? 'text-amber-700 bg-amber-50 border-amber-200' : 'text-rose-700 bg-rose-50 border-rose-200');
+                let rColor = s >= 85 ? 'text-indigo-700 bg-indigo-50 border-indigo-200' : (s >= 70 ? 'text-amber-700 bg-amber-50 border-amber-200' : 'text-rose-700 bg-rose-50 border-rose-200');
                 skKonteyner.innerHTML += `
-                    <div class="p-3 rounded-xl border flex justify-between items-center bg-white shadow-sm">
+                    <div class="p-3 rounded-xl border flex justify-between items-center bg-white shadow-sm hover:border-slate-300 transition-all">
                         <span class="font-bold text-slate-700 truncate max-w-[190px]">${h}</span>
                         <span class="font-black px-2 py-1 rounded-lg border text-xs ${rColor}">${s} / 100</span>
                     </div>`;
             }
 
-            // Aksiyon Listesi Güncelleme
+            // 2. Aksiyon Listesi ve Filtreleme İşlemleri
             const aKonteyner = document.getElementById('aksiyon-listesi-konteyner');
-            let aciklar = kayitlar.filter(k => k.durum === "AÇIK");
+            let aciklar = kayitlar.filter(k => k.durum === "AÇIK" || k.durum === "KAPAMA ONAYI BEKLİYOR");
             document.getElementById('badge-aksiyon-sayi').innerText = aciklar.length;
-            aKonteyner.innerHTML = aciklar.length === 0 ? `<p class="text-xs text-slate-400 italic text-center p-4 bg-white rounded-xl">Açık bir aksiyon maddesi bulunmuyor.</p>` : '';
+
+            // Filtre Seçimlerini Alıyoruz
+            const fHat = document.getElementById('filtre-hat').value;
+            const fLider = document.getElementById('filtre-lider').value;
+            const fTur = document.getElementById('filtre-tur').value;
+
+            // Filtreleme Algoritması
+            let filtrelenmisAciklar = aciklar.filter(k => {
+                // Hat Filtresi
+                if (fHat && k.hat !== fHat) return false;
+                
+                // Lider Filtresi
+                if (fLider && k.sorumlu !== fLider) return false;
+                
+                // Kategori Filtresi
+                if (fTur === "ISG") {
+                    if (!k.seciliSorular) return false;
+                    const hasIsg = k.seciliSorular.includes("Q4") || k.seciliSorular.includes("Q15") || k.seciliSorular.includes("Q19");
+                    if (!hasIsg) return false;
+                }
+                if (fTur === "TEKERRUR") {
+                    if (!k.tekerrurRaporu || !k.tekerrurRaporu.includes("🚨 TEKERRÜR!")) return false;
+                }
+                if (fTur === "KAPAMA" && k.durum !== "KAPAMA ONAYI BEKLİYOR") {
+                    return false;
+                }
+
+                return true;
+            });
+
+            // Eşleşen filtre sayısını arayüzde göster
+            document.getElementById('filtre-eslesen-sayi').innerText = filtrelenmisAciklar.length;
+
+            aKonteyner.innerHTML = filtrelenmisAciklar.length === 0 ? `<p class="text-xs text-slate-400 italic text-center p-4 bg-white rounded-xl">Filtrelere uygun açık bulgu kaydı bulunamadı.</p>` : '';
             
-            aciklar.forEach(k => {
+            filtrelenmisAciklar.forEach(k => {
+                let isWaiting = k.durum === "KAPAMA ONAYI BEKLİYOR";
                 aKonteyner.innerHTML += `
-                    <div class="bg-white p-4 rounded-xl border border-l-4 border-l-rose-500 shadow-sm text-xs space-y-2">
+                    <div class="bg-white p-4 rounded-xl border border-l-4 ${isWaiting ? 'border-l-amber-500 bg-amber-50/10' : 'border-l-rose-500'} shadow-sm text-xs space-y-2">
                         <div class="flex justify-between items-start">
                             <div>
-                                <h4 class="font-black text-slate-900">${k.hat}</h4>
+                                <h4 class="font-black text-slate-900 text-sm">${k.hat}</h4>
                                 <p class="text-[10px] text-slate-400">Tarih: ${k.tarih} | Sorumlu: <b>${k.sorumlu}</b></p>
                             </div>
-                            <span class="bg-rose-100 text-rose-800 px-2 py-0.5 rounded font-bold text-[10px]">${k.qId} | Durum: 0.0</span>
+                            <span class="${isWaiting ? 'bg-amber-100 text-amber-800' : 'bg-rose-100 text-rose-800'} px-2 py-0.5 rounded font-bold text-[10px] tracking-wide">
+                                Maddeler: ${k.seciliSorular} | Dinamik Etki: -${k.kirilanPuan}p
+                            </span>
                         </div>
-                        <p class="bg-slate-50 p-2 rounded text-slate-700"><b>Eşleşen Soru:</b> ${k.soruMetni}<br><b>Saha Bulgusu:</b> ${k.metin}</p>
-                        ${k.foto ? `<img src="${k.foto}" class="w-20 h-20 object-cover rounded-lg border mt-1">` : ''}
-                        <div class="flex justify-end pt-2 border-t"><button onclick="aksiyonKapat('${k.firebaseKey}')" class="bg-emerald-600 text-white font-bold px-3 py-1 rounded text-[11px]">✓ Kapat & Puanı İade Et</button></div>
+                        <div class="bg-slate-50 p-3 rounded-xl text-slate-700 space-y-1.5 border">
+                            <p><b>🔍 Personel Beyanı:</b> ${k.metin}</p>
+                            <p class="text-indigo-700 font-semibold bg-indigo-50/70 p-2.5 rounded-lg border border-indigo-100 leading-relaxed whitespace-pre-line"><b>🚨 Birleştirilmiş AI Aksiyon Planı:</b>\n${k.otomatikAksiyon}</p>
+                            ${k.tekerrurRaporu ? `<p class="text-[10px] text-rose-700 bg-rose-50 p-2 rounded border border-rose-100 font-bold">📋 Tekerrür Analiz Detayı: ${k.tekerrurRaporu}</p>` : ''}
+                        </div>
+                        
+                        <div class="flex gap-3 items-center pt-1">
+                            ${k.foto ? `<div><p class="text-[9px] text-slate-400 mb-0.5">Bulgu:</p><img src="${k.foto}" onclick="buyukFotoAc(this.src)" class="w-14 h-14 object-cover rounded-lg border cursor-pointer hover:opacity-80 transition-all"></div>` : ''}
+                            ${isWaiting && k.kapamaFotosu ? `<div><p class="text-[9px] text-amber-600 mb-0.5">Düzeltme:</p><img src="${k.kapamaFotosu}" onclick="buyukFotoAc(this.src)" class="w-14 h-14 object-cover rounded-lg border border-amber-300 cursor-pointer hover:opacity-80 transition-all"></div>` : ''}
+                        </div>
+
+                        ${isWaiting ? `
+                            <p class="text-[11px] text-amber-700 italic font-bold pt-1">⚠️ Kapama kanıtı yüklendi, amir onayı bekleniyor.</p>
+                        ` : `
+                            <div class="flex justify-end pt-2 border-t border-slate-100">
+                                <button onclick="aksiyonKapamaModaliAc('${k.firebaseKey}')" class="bg-indigo-600 text-white font-bold px-4 py-2 rounded-xl text-[11px] shadow hover:bg-indigo-700 transition-all">
+                                    🔧 Aksiyon Kapat (Açıklama & Fotoğraf)
+                                </button>
+                            </div>
+                        `}
                     </div>`;
             });
 
-            // Onay Havuzu Güncelleme
+            // 3. Onay Havuzu Güncelleme
             const oKonteyner = document.getElementById('onay-havuzu-konteyner');
-            let onayBekleyenler = kayitlar.filter(k => k.durum === "ONAY BEKLİYOR");
+            let onayBekleyenler = kayitlar.filter(k => k.durum === "ONAY BEKLİYOR" || k.durum === "KAPAMA ONAYI BEKLİYOR");
             document.getElementById('badge-onay-sayi').innerText = onayBekleyenler.length;
-            oKonteyner.innerHTML = onayBekleyenler.length === 0 ? `<p class="text-xs text-slate-400 italic text-center p-4 bg-white rounded-xl">Onay bekleyen kayıt yok.</p>` : '';
+            oKonteyner.innerHTML = onayBekleyenler.length === 0 ? `<p class="text-xs text-slate-400 italic text-center p-4 bg-white rounded-xl">Onay bekleyen kayıt veya kapama talebi yok.</p>` : '';
 
             onayBekleyenler.forEach(k => {
-                oKonteyner.innerHTML += `
-                    <div class="bg-indigo-50/30 p-4 rounded-xl border border-indigo-100 text-xs space-y-3">
-                        <div class="flex justify-between">
-                            <span class="font-bold text-slate-900">${k.hat}</span>
-                            <span class="text-indigo-600 font-bold">${k.qId} (${k.adimAdi})</span>
-                        </div>
-                        <p class="bg-white p-2 border rounded text-slate-700"><b>Bulgu:</b> ${k.metin}<br><b class="text-indigo-600">Otomatik Atanan Soru:</b> ${k.soruMetni}</p>
-                        <div class="flex justify-end gap-2">
-                            <button onclick="onayReddet('${k.firebaseKey}')" class="bg-rose-100 text-rose-700 px-3 py-1.5 rounded font-bold">Reddet</button>
-                            <button onclick="onayOnayla('${k.firebaseKey}')" class="bg-indigo-600 text-white px-4 py-1.5 rounded font-black">Onayla (0.0 Puan Ver)</button>
-                        </div>
-                    </div>`;
+                if (k.durum === "ONAY BEKLİYOR") {
+                    const simulePuan = hesaplaTekerrurVeKatliPuan(k.hat, k.seciliSorular);
+                    
+                    oKonteyner.innerHTML += `
+                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-xs space-y-3 shadow-sm">
+                            <div class="flex justify-between items-center">
+                                <span class="font-bold text-slate-900 text-sm">📍 ${k.hat} [YENİ BULGU TALEBİ]</span>
+                                <span class="text-indigo-600 font-bold bg-indigo-50 px-2 py-0.5 rounded border border-indigo-100">İhlal Maddeleri: ${k.seciliSorular}</span>
+                            </div>
+                            <p class="bg-white p-3 border rounded-xl text-slate-700 leading-relaxed"><b>Girilen Kusur:</b> ${k.metin}<br><br><b class="text-indigo-600 whitespace-pre-line">AI Çoklu Eşleştirme Çıktısı:</b>\n${k.otomatikAksiyon}</p>
+                            <div class="bg-amber-50 border border-amber-200 p-2.5 rounded-xl text-[11px] text-amber-900 font-medium">
+                                📊 <b>Öngörülen Puan Durumu:</b> ${simulePuan.raporText}
+                            </div>
+                            ${k.foto ? `<div><p class="text-[10px] text-slate-400 mb-1">Kanıt Görseli (Tıkla Büyüt):</p><img src="${k.foto}" onclick="buyukFotoAc(this.src)" class="w-16 h-16 object-cover rounded-lg border cursor-pointer hover:opacity-80"></div>` : ''}
+                            <div class="flex justify-end gap-2 pt-2 border-t">
+                                <button onclick="onayReddet('${k.firebaseKey}')" class="bg-rose-50 text-rose-700 border border-rose-200 px-3 py-1.5 rounded-xl font-bold hover:bg-rose-100 transition-all">Talebi İptal Et</button>
+                                <button onclick="onayOnayla('${k.firebaseKey}', '${k.hat}', '${k.seciliSorular}')" class="bg-indigo-600 text-white px-4 py-1.5 rounded-xl font-black shadow hover:bg-indigo-700 transition-all">Onayla ve Açık Bulgu Yap (-${simulePuan.nihaiCeza} Puan)</button>
+                            </div>
+                        </div>`;
+                } else if (k.durum === "KAPAMA ONAYI BEKLİYOR") {
+                    oKonteyner.innerHTML += `
+                        <div class="bg-amber-50/40 p-4 rounded-xl border border-amber-200 text-xs space-y-3 shadow-sm">
+                            <div class="flex justify-between">
+                                <span class="font-bold text-amber-800 text-sm">✅ AKSİYON KAPAMA ONAY TALEBİ</span>
+                                <span class="text-slate-500 font-bold">Maddeler: ${k.seciliSorular}</span>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 bg-white p-3 rounded-xl border border-slate-200/80">
+                                <div>
+                                    <p class="text-[10px] font-bold text-rose-600 uppercase tracking-wider">AÇILAN KUSUR VERİSİ:</p>
+                                    <p class="text-slate-700 mt-1"><b>Bulgu:</b> ${k.metin}</p>
+                                    ${k.foto ? `<img src="${k.foto}" onclick="buyukFotoAc(this.src)" class="w-14 h-14 object-cover rounded border mt-2 cursor-pointer hover:opacity-80">` : ''}
+                                </div>
+                                <div class="border-t md:border-t-0 md:border-l pt-2 md:pt-0 md:pl-3">
+                                    <p class="text-[10px] font-bold text-emerald-600 uppercase tracking-wider">SAHADAN GELEN CEVAP & DÜZELTME:</p>
+                                    <p class="text-slate-700 mt-1"><b>Lider Açıklaması:</b> ${k.kapamaAciklamasi}</p>
+                                    ${k.kapamaFotosu ? `<img src="${k.kapamaFotosu}" onclick="buyukFotoAc(this.src)" class="w-14 h-14 object-cover rounded border mt-2 cursor-pointer hover:opacity-80">` : ''}
+                                </div>
+                            </div>
+                            <div class="flex justify-end gap-2 pt-1">
+                                <button onclick="kapamaReddet('${k.firebaseKey}')" class="bg-rose-50 text-rose-700 border border-rose-200 px-3 py-1.5 rounded-xl font-bold hover:bg-rose-100 transition-all">Reddet (Kusur Açık Kalsın)</button>
+                                <button onclick="kapamaOnayla('${k.firebaseKey}')" class="bg-emerald-600 text-white px-4 py-1.5 rounded-xl font-black shadow hover:bg-emerald-700 transition-all">Kapamayı Onayla (Puanı İade Et)</button>
+                            </div>
+                        </div>`;
+                }
             });
 
             if(isAdmin) yoneticiPaneliniHesapla();
         }
 
-        function onayOnayla(key) { db.ref("checklist_denetimler/" + key).update({ durum: "AÇIK" }); }
+        function onayOnayla(key, hatAdi, seciliSorular) { 
+            const analiz = hesaplaTekerrurVeKatliPuan(hatAdi, seciliSorular);
+            const hedefKayit = kayitlar.find(k => k.firebaseKey === key);
+
+            let yeniAksiyonMetni = hedefKayit.otomatikAksiyon || "";
+            if (analiz.ekAksiyonlar) {
+                yeniAksiyonMetni += analiz.ekAksiyonlar; 
+            }
+
+            db.ref("checklist_denetimler/" + key).update({ 
+                durum: "AÇIK",
+                kirilanPuan: analiz.nihaiCeza, 
+                tekerrurRaporu: analiz.raporText,
+                otomatikAksiyon: yeniAksiyonMetni
+            }); 
+        }
+
         function onayReddet(key) { db.ref("checklist_denetimler/" + key).remove(); }
-        function aksiyonKapat(key) { db.ref("checklist_denetimler/" + key).update({ durum: "KAPALI" }); }
+        function kapamaOnayla(key) { db.ref("checklist_denetimler/" + key).update({ durum: "KAPALI" }); }
+        function kapamaReddet(key) { 
+            db.ref("checklist_denetimler/" + key).update({ 
+                durum: "AÇIK", 
+                kapamaAciklamasi: null, 
+                kapamaFotosu: null, 
+                kapamaTalepTarihi: null 
+            }); 
+        }
 
         function yoneticiPaneliniHesapla() {
             let total = 0, count = 0, birimGruplari = {};
             let onaylilar = kayitlar.filter(k => k.durum !== "ONAY BEKLİYOR");
-            let isgCount = onaylilar.filter(k => (k.qId === "Q4" || k.qId === "Q15" || k.qId === "Q19") && k.durum === "AÇIK").length;
+            
+            let isgCount = onaylilar.filter(k => {
+                if(!k.seciliSorular || k.durum !== "AÇIK") return false;
+                return k.seciliSorular.includes("Q4") || k.seciliSorular.includes("Q15") || k.seciliSorular.includes("Q19");
+            }).length;
 
             for(let h in hatlar) {
                 let s = hatSkorHesapla(h); total += s; count++;
@@ -488,23 +772,27 @@
             }
 
             document.getElementById('genel-ortalama-puan').innerText = Math.round(total / count) + " / 100";
-            document.getElementById('yonetim-toplam-acik').innerText = kayitlar.filter(k => k.durum === "AÇIK").length;
+            document.getElementById('yonetim-toplam-acik').innerText = kayitlar.filter(k => k.durum === "AÇIK" || k.durum === "KAPAMA ONAYI BEKLİYOR").length;
             document.getElementById('yonetim-toplam-kayit').innerText = onaylilar.length;
             document.getElementById('yonetim-kritik-isg').innerText = isgCount;
 
-            // Log Tablosu
             const logT = document.getElementById('detay-log-tablo');
             logT.innerHTML = '';
             onaylilar.forEach(k => {
                 logT.innerHTML += `
-                    <tr class="border-b">
+                    <tr class="border-b hover:bg-slate-50 transition-all">
                         <td class="p-3">${k.tarih}</td>
-                        <td class="p-3 font-bold">${k.personel}</td>
-                        <td class="p-3 font-bold text-slate-800">${k.hat}</td>
-                        <td class="p-3">${k.qId} - ${k.soruMetni.substring(0,40)}...</td>
-                        <td class="p-3 text-rose-600 font-bold">${k.durum === 'AÇIK' ? '0.0 (Çok Yetersiz)' : '5.0 (Kapatıldı)'}</td>
-                        <td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${k.durum === 'AÇIK' ? 'bg-amber-100 text-amber-800':'bg-emerald-100 text-emerald-800'}">${k.durum}</span></td>
-                        <td class="p-3 text-center">${k.foto ? '📷 Var' : '-'}</td>
+                        <td class="p-3 font-bold text-slate-700">${k.personel}</td>
+                        <td class="p-3 font-bold text-slate-900">${k.hat}</td>
+                        <td class="p-3 font-semibold text-indigo-700">${k.seciliSorular || 'Genel'}</td>
+                        <td class="p-3 text-rose-600 font-black">${k.durum === 'AÇIK' || k.durum === 'KAPAMA ONAYI BEKLİYOR' ? `-${k.kirilanPuan}p` : '0p (Kapatıldı)'}</td>
+                        <td class="p-3">
+                            <span class="px-2 py-0.5 rounded text-[10px] font-bold ${
+                                k.durum === 'AÇIK' ? 'bg-rose-100 text-rose-800' : 
+                                (k.durum === 'KAPAMA ONAYI BEKLİYOR' ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800')
+                            }">${k.durum}</span>
+                        </td>
+                        <td class="p-3 text-center">${k.foto ? '📷 Görsel' : '-'}</td>
                     </tr>`;
             });
 
@@ -518,20 +806,24 @@
             if (trendChartInstance) trendChartInstance.destroy();
             trendChartInstance = new Chart(document.getElementById('trendChart').getContext('2d'), {
                 type: 'bar',
-                data: { labels: labels, datasets: [{ data: values, backgroundColor: '#4f46e5', borderRadius: 6 }] },
-                options: { responsive: true, maintainAspectRatio: false, indexAxis: 'y', scales: { x: { min: 0, max: 100 } }, plugins: { legend: { display: false } } }
+                data: { labels: labels, datasets: [{ data: values, backgroundColor: '#4f46e5', borderRadius: 6, barThickness: 14 }] },
+                options: { responsive: true, maintainAspectRatio: false, indexAxis: 'y', scales: { x: { min: 0, max: 100, grid: { display: false } }, y: { grid: { display: false } } }, plugins: { legend: { display: false } } }
             });
 
-            // Adım Dağılım Sayımları
             let adimSayilari = [0, 0, 0, 0, 0];
-            kayitlar.filter(k => k.durum === "AÇIK").forEach(k => {
-                if(k.qId) {
-                    let num = parseInt(k.qId.replace("Q", ""));
-                    if(num <= 5) adimSayilari[0]++;
-                    else if(num <= 10) adimSayilari[1]++;
-                    else if(num <= 14) adimSayilari[2]++;
-                    else if(num <= 18) adimSayilari[3]++;
-                    else adimSayilari[4]++;
+            kayitlar.filter(k => k.durum === "AÇIK" || k.durum === "KAPAMA ONAYI BEKLİYOR").forEach(k => {
+                if(k.seciliSorular) {
+                    let arr = k.seciliSorular.split(',').map(s => s.trim());
+                    arr.forEach(qId => {
+                        let num = parseInt(qId.replace("Q", ""));
+                        if(!isNaN(num)) {
+                            if(num <= 5) adimSayilari[0]++;
+                            else if(num <= 10) adimSayilari[1]++;
+                            else if(num <= 14) adimSayilari[2]++;
+                            else if(num <= 18) adimSayilari[3]++;
+                            else adimSayilari[4]++;
+                        }
+                    });
                 }
             });
 
@@ -539,20 +831,21 @@
             donutChartInstance = new Chart(document.getElementById('donutChart').getContext('2d'), {
                 type: 'doughnut',
                 data: {
-                    labels: ['1.Adım', '2.Adım', '3.Adım', '4.Adım', '5.Adım'],
-                    datasets: [{ data: adimSayilari, backgroundColor: ['#ef4444', '#f97316', '#06b6d4', '#3b82f6', '#a855f7'] }]
+                    labels: ['1.Adım (Ayıkla)', '2.Adım (Düzenle)', '3.Adım (Temizle)', '4.Adım (Standartlaştır)', '5.Adım (Disiplin)'],
+                    datasets: [{ data: adimSayilari, backgroundColor: ['#6366f1', '#4f46e5', '#4338ca', '#312e81', '#1e1b4b'], borderHex: '#ffffff', borderWidth: 2 }]
                 },
-                options: { responsive: true, maintainAspectRatio: false }
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } } } }
             });
         }
 
         function excelDosyasiAl() {
-            let csv = "\uFEFFTarih;Denetci;Alan;SoruNo;Soru;Puan Durumu\n";
+            let csv = "\uFEFFTarih;Denetci;Alan;IhlalMaddeleri;CezaPuani;Durum;KapamaAciklamasi\n";
             kayitlar.filter(k => k.durum !== "ONAY BEKLİYOR").forEach(k => {
-                csv += `${k.tarih};${k.personel};${k.hat};${k.qId};${k.soruMetni.replace(/;/g,',')};${k.durum}\n`;
+                let kapAciklama = k.kapamaAciklamasi ? k.kapamaAciklamasi.replace(/;/g,',') : '-';
+                csv += `${k.tarih};${k.personel};${k.hat};${k.seciliSorular || 'Genel'};${k.kirilanPuan};${k.durum};${kapAciklama}\n`;
             });
             let b = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-            let l = document.createElement("a"); l.href = URL.createObjectURL(b); l.download = "5S_Checklist_Raporu.csv"; l.click();
+            let l = document.createElement("a"); l.href = URL.createObjectURL(b); l.download = "5S_Akıllı_Analiz_Raporu.csv"; l.click();
         }
 
         function authModaliAc() { document.getElementById('auth-modal').classList.remove('hidden'); }
@@ -580,7 +873,6 @@
         function sekmeDegistir(h) {
             document.getElementById('sayfa-qr').classList.toggle('hidden', h !== 'qr');
             document.getElementById('sayfa-canli-skor').classList.toggle('hidden', h !== 'canli-skor');
-            document.getElementById('sayfa-puanlama').classList.toggle('hidden', h !== 'puanlama');
             document.getElementById('sayfa-aksiyon').classList.toggle('hidden', h !== 'aksiyon');
             document.getElementById('sayfa-onay').classList.toggle('hidden', h !== 'onay');
             document.getElementById('sayfa-rapor').classList.toggle('hidden', h !== 'rapor');
